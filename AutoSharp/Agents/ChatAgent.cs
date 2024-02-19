@@ -60,7 +60,7 @@ namespace AutoSharp.Agents
                 previousResponse = response;
                 response = await _client.SendAsync(_chatContext).ConfigureAwait(false);
 
-                var isEnded = response.Content.Contains(ChatHelpers.ChatEndString);
+                var isEnded = response.Content.Contains(ChatHelpers.ChatEndString) || response.Content.EndsWith("?");
                 response.Content = ChatHelpers.RemoveChatEndString(response.Content);
 
                 var toolInvocation = ChatHelpers.ParseTools(response.Content).FirstOrDefault();
@@ -89,7 +89,7 @@ namespace AutoSharp.Agents
                         if (!_toolConfirmation.Confirm(toolInvocation)) break;
                         var toolResponse = tool.Invoke(toolInvocation.Parameter);
                         _chatContext.AddMessage(Role.User, toolResponse);
-                        OnChatResponse($"Result:\n{toolResponse}");
+                        OnChatResponse(toolResponse);
                     }
                 }
                 else

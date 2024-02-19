@@ -1,6 +1,7 @@
 ﻿using AutoSharp.Tools;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace AutoSharp.Utilities
@@ -45,13 +46,14 @@ namespace AutoSharp.Utilities
         public static IList<ToolInvocation> ParseTools(string message)
         {
             var tools = new List<ToolInvocation>();
-            var matches = Regex.Matches(message, @"\{(\s+)?""Name""(\s+)?:(\s+)?""(?<name>[A-Za-z0-9]+)""(\s+)?,(\s+)?""Parameter"":(\s+)?""(?<parameter>.+?)""(\s+)?\}");
+            var matches = Regex.Matches(message, @"\{(\s+)?""Name""(\s+)?:(\s+)?""(?<name>[A-Za-z0-9]+)""(\s+)?,(\s+)?""Parameter"":(\s+)?(?<parameter>"".+?"")(\s+)?\}");
             foreach (Match match in matches)
             {
+                var parameterValue = JsonSerializer.Deserialize<string>(match.Groups["parameter"].Value);
                 tools.Add(new ToolInvocation
                 {
                     Name = match.Groups["name"].Value,
-                    Parameter = Regex.Unescape(match.Groups["parameter"].Value)
+                    Parameter = parameterValue
                 });
             }
             return tools;
