@@ -75,7 +75,7 @@ namespace AutoSharp.Chat
             var toolsSystemMessage = ChatHelpers.CreateDefaultSystemMessage(_systemMessage, _tools);
             request.AddMessage(Role.System.ToString().ToLowerInvariant(), toolsSystemMessage);
 
-            var messageTokens = TokenHelpers.EstimateTokenCount(message.Content) + 1;
+            var messageTokens = TokenHelpers.CalculateTokenCount(message.Content) + 1;
             var maxTokens = _maxTokens - messageTokens;
             if (maxTokens < 0) throw new ChatException("Message is too long");
 
@@ -123,7 +123,7 @@ namespace AutoSharp.Chat
             foreach (var message in request.Messages)
             {
                 tokens += 1; // Role token
-                tokens += TokenHelpers.EstimateTokenCount(message.Content);
+                tokens += TokenHelpers.CalculateTokenCount(message.Content);
             }
             return tokens;
         }

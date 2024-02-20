@@ -1,14 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using SharpToken;
 
 namespace AutoSharp.Utilities
 {
     public static class TokenHelpers
     {
-        private static readonly Regex _tokenRegex = new Regex(@"\p{L}+('\p{L}+)*|[\p{N}\p{P}\p{S}]+", RegexOptions.Compiled);
-        public static int EstimateTokenCount(string text)
+        public static int CalculateTokenCount(string text)
         {
             if (string.IsNullOrEmpty(text)) return 0;
-            return _tokenRegex.Matches(text).Count;
+            return GptEncoding.GetEncodingForModel("gpt-4").Encode(text).Count;
         }
     }
 }
