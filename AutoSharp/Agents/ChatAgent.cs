@@ -88,6 +88,7 @@ namespace AutoSharp.Agents
                     {
                         if (!_toolConfirmation.Confirm(toolInvocation)) break;
                         var toolResponse = tool.Invoke(toolInvocation.Parameter);
+                        toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
                         _chatContext.AddMessage(Role.User, toolResponse);
                         OnChatResponse(toolResponse);
                     }

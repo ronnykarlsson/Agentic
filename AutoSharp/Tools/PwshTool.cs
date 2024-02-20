@@ -24,7 +24,7 @@ namespace AutoSharp.Tools
                 // Clean up: delete the temporary file
                 File.Delete(tempFilePath);
 
-                return StripAnsiColorCodes(result);
+                return result;
             }
             catch (Exception ex)
             {
@@ -66,13 +66,6 @@ namespace AutoSharp.Tools
             {
                 return $"Exception: {ex.Message}";
             }
-        }
-
-        private static string StripAnsiColorCodes(string text)
-        {
-            // ANSI color code pattern
-            var ansiCodePattern = @"\x1B\[[0-9;]*m";
-            return System.Text.RegularExpressions.Regex.Replace(text, ansiCodePattern, string.Empty);
         }
     }
 }
