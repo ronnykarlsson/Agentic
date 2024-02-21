@@ -94,9 +94,13 @@ namespace AutoSharp.Chat
             for (int i = context.Messages.Count - 1; i >= 0; i--)
             {
                 var contextMessage = context.Messages[i];
-                if (CalculateTokens(request) >= maxTokens) break;
-
                 request.Messages.Insert(messagePosition, new OpenAIMessage(contextMessage.Role.ToString().ToLowerInvariant(), contextMessage.Content));
+
+                if (CalculateTokens(request) > maxTokens)
+                {
+                    context.Messages.RemoveAt(messagePosition);
+                    break;
+                }
             }
         }
 
