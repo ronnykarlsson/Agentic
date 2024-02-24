@@ -6,12 +6,14 @@ namespace Agentic.Tools
 {
     public class PwshTool : ITool
     {
-        public string Name { get; set; } = "pwsh";
-        public string ParameterName { get; set; } = "script";
+        public string Tool { get; set; } = "pwsh";
         public string Description { get; set; } = "Executes a PowerShell script, file management, systems management, access external resources and anything else";
+        public ToolParameter<string> Script { get; set; }
 
-        public string Invoke(string script)
+        public string Invoke()
         {
+            var script = Script.Value;
+
             // Save script to a temporary file
             string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".ps1");
             try

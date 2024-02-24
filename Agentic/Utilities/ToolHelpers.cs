@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Agentic.Utilities
+﻿namespace Agentic.Utilities
 {
     public static class ToolHelpers
     {

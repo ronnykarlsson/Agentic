@@ -2,9 +2,8 @@
 {
     public interface ITool
     {
-        string Name { get; }
-        string ParameterName { get; }
+        string Tool { get; }
         string Description { get; }
-        string Invoke(string parameter);
+        string Invoke();
     }
 }

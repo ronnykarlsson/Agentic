@@ -2,7 +2,7 @@
 {
     public class AlwaysConfirmToolConfirmation : IToolConfirmation
     {
-        public bool Confirm(ToolInvocation toolInvocation)
+        public bool Confirm(ITool tool)
         {
             return true;
         }

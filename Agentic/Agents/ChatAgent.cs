@@ -63,7 +63,7 @@ namespace Agentic.Agents
                 var isEnded = response.Content.Contains(ChatHelpers.ChatEndString) || response.Content.EndsWith("?");
                 response.Content = ChatHelpers.RemoveChatEndString(response.Content);
 
-                var toolInvocation = ChatHelpers.ParseTools(response.Content).FirstOrDefault();
+                var toolInvocation = ChatHelpers.ParseTools(_tools, response.Content).FirstOrDefault();
 
                 if (toolInvocation != null)
                 {
@@ -79,15 +79,16 @@ namespace Agentic.Agents
 
                 if (toolInvocation != null)
                 {
-                    var tool = _tools?.FirstOrDefault(t => t.Name == toolInvocation.Name);
+                    var tool = _tools?.FirstOrDefault(t => t.Tool == toolInvocation.Tool);
                     if (tool == null)
                     {
-                        _chatContext.AddMessage(Role.User, $"No tool named: {toolInvocation.Name}");
+                        _chatContext.AddMessage(Role.User, $"No tool named: {toolInvocation.Tool}");
                     }
                     else
                     {
                         if (!_toolConfirmation.Confirm(toolInvocation)) break;
-                        var toolResponse = tool.Invoke(toolInvocation.Parameter);
+
+                        var toolResponse = tool.Invoke();
                         toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
                         _chatContext.AddMessage(Role.User, toolResponse);
                         OnChatResponse(toolResponse);

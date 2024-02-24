@@ -2,6 +2,6 @@
 {
     public interface IToolConfirmation
     {
-        bool Confirm(ToolInvocation toolInvocation);
+        bool Confirm(ITool toolInvocation);
     }
 }
