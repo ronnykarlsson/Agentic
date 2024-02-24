@@ -62,7 +62,14 @@ namespace Agentic.Utilities
                 }
                 else
                 {
-                    toolInfo[property.Name] = CreateDefault(valueType);
+                    if (valueType == typeof(string))
+                    {
+                        toolInfo[property.Name] = $"<{property.Name}>";
+                    }
+                    else
+                    {
+                        toolInfo[property.Name] = CreateDefault(valueType);
+                    }
                 }
             }
 
@@ -148,6 +155,8 @@ namespace Agentic.Utilities
                 if (!elements.Any()) continue;
 
                 var element = elements.First();
+                var toolName = element.GetProperty(nameof(ITool.Tool)).GetString();
+                if (tool.Tool != toolName) continue;
 
                 // Process each property of the tool
                 foreach (var property in tool.GetType().GetProperties())

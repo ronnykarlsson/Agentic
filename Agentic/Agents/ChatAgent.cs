@@ -65,11 +65,11 @@ namespace Agentic.Agents
                 var isEnded = response.Content.Contains(ChatHelpers.ChatEndString) || response.Content.EndsWith("?");
                 response.Content = ChatHelpers.RemoveChatEndString(response.Content);
 
-                var toolInvocation = ChatHelpers.ParseTools(_tools, response.Content).FirstOrDefault();
+                var tool = ChatHelpers.ParseTools(_tools, response.Content).FirstOrDefault();
 
-                if (toolInvocation != null)
+                if (tool != null)
                 {
-                    var toolInvocationMessage = ChatHelpers.GetToolInvocationMessage(new[] { toolInvocation });
+                    var toolInvocationMessage = ChatHelpers.GetToolInvocationMessage(new[] { tool });
                     response.Content = toolInvocationMessage;
                 }
 
@@ -82,26 +82,18 @@ namespace Agentic.Agents
                     });
                 }
 
-                if (toolInvocation != null)
+                if (tool != null)
                 {
-                    var tool = _tools?.FirstOrDefault(t => t.Tool == toolInvocation.Tool);
-                    if (tool == null)
-                    {
-                        _chatContext.AddMessage(Role.User, $"No tool named: {toolInvocation.Tool}");
-                    }
-                    else
-                    {
-                        if (tool.RequireConfirmation && !_toolConfirmation.Confirm(toolInvocation)) break;
+                    if (tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
-                        var toolResponse = tool.Invoke();
-                        toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
-                        _chatContext.AddMessage(Role.User, toolResponse);
-                        OnChatResponse(new ChatResponseEventArgs
-                        {
-                            Response = toolResponse,
-                            IsTool = true
-                        });
-                    }
+                    var toolResponse = tool.Invoke();
+                    toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
+                    _chatContext.AddMessage(Role.User, toolResponse);
+                    OnChatResponse(new ChatResponseEventArgs
+                    {
+                        Response = toolResponse,
+                        IsTool = true
+                    });
 
                     // Reset non-tool response counter when using tools
                     nonToolResponses = 0;
@@ -111,7 +103,7 @@ namespace Agentic.Agents
                     nonToolResponses++;
                 }
 
-                if (toolInvocation == null && isEnded) break;
+                if (tool == null && isEnded) break;
                 if (previousResponse != null && response.Content == previousResponse.Content) break;
             }
 
