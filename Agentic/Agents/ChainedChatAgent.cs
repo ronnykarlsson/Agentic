@@ -16,7 +16,7 @@ namespace Agentic.Agents
 
             foreach (var chatAgent in chatAgents)
             {
-                chatAgent.ChatResponse += (sender, message) => ChatResponse?.Invoke(sender, message);
+                chatAgent.ChatResponse += (sender, eventArgs) => ChatResponse?.Invoke(sender, eventArgs.Response);
                 chatAgent.SetContext(context);
             }
         }

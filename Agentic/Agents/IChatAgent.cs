@@ -7,7 +7,7 @@ namespace Agentic.Agents
 {
     public interface IChatAgent
     {
-        event EventHandler<string> ChatResponse;
+        event EventHandler<ChatResponseEventArgs> ChatResponse;
         Task<string> ChatAsync(string message);
         void Initialize(string systemMessage, params ITool[] tools);
         void SetSystemMessage(string systemMessage);

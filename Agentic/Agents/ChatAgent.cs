@@ -10,7 +10,7 @@ namespace Agentic.Agents
 {
     public class ChatAgent : IChatAgent
     {
-        public event EventHandler<string> ChatResponse;
+        public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
         private readonly IChatClient _client;
         private readonly IToolConfirmation _toolConfirmation;
@@ -74,7 +74,10 @@ namespace Agentic.Agents
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
                     _chatContext.AddMessage(Role.Assistant, response.Content);
-                    OnChatResponse(response.Content);
+                    OnChatResponse(new ChatResponseEventArgs
+                    {
+                        Response = response.Content
+                    });
                 }
 
                 if (toolInvocation != null)
@@ -91,7 +94,11 @@ namespace Agentic.Agents
                         var toolResponse = tool.Invoke();
                         toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
                         _chatContext.AddMessage(Role.User, toolResponse);
-                        OnChatResponse(toolResponse);
+                        OnChatResponse(new ChatResponseEventArgs
+                        {
+                            Response = toolResponse,
+                            IsTool = true
+                        });
                     }
                 }
                 else
@@ -106,9 +113,9 @@ namespace Agentic.Agents
             return response.Content;
         }
 
-        private void OnChatResponse(string response)
+        private void OnChatResponse(ChatResponseEventArgs eventArgs)
         {
-            ChatResponse?.Invoke(this, response);
+            ChatResponse?.Invoke(this, eventArgs);
         }
 
         public ChatContext GetContext()
