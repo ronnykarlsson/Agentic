@@ -12,6 +12,8 @@ namespace Agentic.Agents
     {
         public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
+        public int MaxNonToolResponses { get; set; } = 3;
+
         private readonly IChatClient _client;
         private readonly IToolConfirmation _toolConfirmation;
 
@@ -54,7 +56,7 @@ namespace Agentic.Agents
             ChatMessage previousResponse = null;
             while (true)
             {
-                if (nonToolResponses >= 5) break;
+                if (nonToolResponses >= MaxNonToolResponses) break;
 
                 // Chat repeatedly for tool usage until done
                 previousResponse = response;
@@ -100,6 +102,9 @@ namespace Agentic.Agents
                             IsTool = true
                         });
                     }
+
+                    // Reset non-tool response counter when using tools
+                    nonToolResponses = 0;
                 }
                 else
                 {
