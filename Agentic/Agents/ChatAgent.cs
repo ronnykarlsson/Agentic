@@ -89,7 +89,7 @@ namespace Agentic.Agents
                     }
                     else
                     {
-                        if (!_toolConfirmation.Confirm(toolInvocation)) break;
+                        if (tool.RequireConfirmation && !_toolConfirmation.Confirm(toolInvocation)) break;
 
                         var toolResponse = tool.Invoke();
                         toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);

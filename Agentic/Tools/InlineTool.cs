@@ -21,6 +21,7 @@ namespace Agentic.Tools
 
         public string Tool { get; }
         public string Description { get; }
+        public bool RequireConfirmation { get; } = true;
 
         public virtual string Invoke()
         {

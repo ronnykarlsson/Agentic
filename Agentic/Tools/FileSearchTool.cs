@@ -9,6 +9,7 @@ namespace Agentic.Tools
         public string Tool { get; }
         public string Description { get; }
         public ToolParameter<string> Query { get; set; }
+        public bool RequireConfirmation { get; }
 
         private readonly LuceneService _datastore;
 

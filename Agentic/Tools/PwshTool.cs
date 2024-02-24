@@ -8,6 +8,7 @@ namespace Agentic.Tools
     {
         public string Tool { get; set; } = "pwsh";
         public string Description { get; set; } = "Executes a PowerShell script, file management, systems management, access external resources and anything else";
+        public bool RequireConfirmation { get; } = true;
         public ToolParameter<string> Script { get; set; }
 
         public string Invoke()
