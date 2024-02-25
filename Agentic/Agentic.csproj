@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Agentic</Title>
+    <Description>AI agent framework with support for tools.</Description>
+    <Copyright>Copyright (c) Ronny Karlsson 2024</Copyright>
+    <Authors>Ronny Karlsson</Authors>
+    <PackageProjectUrl>https://github.com/ronnykarlsson/Agentic</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
