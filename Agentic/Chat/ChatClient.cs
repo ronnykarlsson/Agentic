@@ -82,6 +82,16 @@ namespace Agentic.Chat
             SystemMessage = systemMessage;
         }
 
+        public string LimitMessageSize(string message, float percentMaxTokens)
+        {
+            var messageTokens = CalculateTokens(message);
+            var maxTokens = (int)(MaxTokens * percentMaxTokens);
+            if (messageTokens <= maxTokens) return message;
+
+            var newMessageSize = ((float)maxTokens / (float)messageTokens) * message.Length;
+            return message.Substring(0, (int) newMessageSize) + "...";
+        }
+
         public void SetTools(ITool[] tools)
         {
             Tools = tools;

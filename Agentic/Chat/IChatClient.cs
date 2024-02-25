@@ -9,5 +9,6 @@ namespace Agentic.Chat
         void SetTools(ITool[] tools);
         Task<ChatMessage> SendAsync(ChatContext context);
         Task<ChatMessage> SendAsync(ChatContext context, ChatMessage message);
+        string LimitMessageSize(string message, float percentMaxTokens);
     }
 }

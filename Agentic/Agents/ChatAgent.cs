@@ -12,7 +12,15 @@ namespace Agentic.Agents
     {
         public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
+        /// <summary>
+        /// Maximum number of non-tool responses before ending chat, which might occur if AI isn't understanding the instructions.
+        /// </summary>
         public int MaxNonToolResponses { get; set; } = 3;
+
+        /// <summary>
+        /// Limit tool response to percentage of token limit
+        /// </summary>
+        public float LimitToolResponseSize { get; set; } = 0.6f;
 
         private readonly IChatClient _client;
         private readonly IToolConfirmation _toolConfirmation;
@@ -88,6 +96,7 @@ namespace Agentic.Agents
 
                     var toolResponse = tool.Invoke();
                     toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
+                    toolResponse = _client.LimitMessageSize(toolResponse, LimitToolResponseSize);
                     _chatContext.AddMessage(Role.User, toolResponse);
                     OnChatResponse(new ChatResponseEventArgs
                     {
