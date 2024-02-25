@@ -239,3 +239,12 @@ dotnet_naming_style.prefix_underscore.required_prefix = _
 dotnet_naming_rule.private_fields_with_underscore.symbols = private_fields
 dotnet_naming_rule.private_fields_with_underscore.style = prefix_underscore
 dotnet_naming_rule.private_fields_with_underscore.severity = warning
+
+dotnet_naming_rule.protected_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.protected_fields_should_be_pascal_case.symbols = protected_fields
+dotnet_naming_rule.protected_fields_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.protected_fields.applicable_kinds = field
+dotnet_naming_symbols.protected_fields.applicable_accessibilities = protected, protected_internal
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
