@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
     <Version>0.1.0-alpha</Version>
+	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 </Project>
