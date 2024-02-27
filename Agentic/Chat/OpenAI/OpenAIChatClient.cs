@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Agentic.Chat
+namespace Agentic.Chat.OpenAI
 {
     public class OpenAIChatClient : ChatClient<OpenAIRequest>, IOpenAIChatClient
     {

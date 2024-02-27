@@ -1,7 +1,7 @@
 ﻿using Agentic.Clients.OpenAI;
 using Microsoft.Extensions.Configuration;
 
-namespace Agentic.Chat
+namespace Agentic.Chat.OpenAI
 {
     public class OpenAIChatClientFactory : IOpenAIChatClientFactory
     {
@@ -14,7 +14,7 @@ namespace Agentic.Chat
             _configuration = configuration;
         }
 
-        public IOpenAIChatClient Create()
+        public IChatClient Create()
         {
             return new OpenAIChatClient(_client, _configuration);
         }

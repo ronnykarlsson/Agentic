@@ -5,10 +5,10 @@ namespace Agentic.Agents
 {
     public class ChatAgentFactory : IChatAgentFactory
     {
-        private readonly IOpenAIChatClientFactory _clientFactory;
+        private readonly IChatClientFactory _clientFactory;
         private readonly IToolConfirmation _toolConfirmation;
 
-        public ChatAgentFactory(IOpenAIChatClientFactory clientFactory, IToolConfirmation toolConfirmation)
+        public ChatAgentFactory(IChatClientFactory clientFactory, IToolConfirmation toolConfirmation)
         {
             _clientFactory = clientFactory;
             _toolConfirmation = toolConfirmation;

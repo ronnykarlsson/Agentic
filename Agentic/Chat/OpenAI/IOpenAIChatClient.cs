@@ -1,4 +1,4 @@
-﻿namespace Agentic.Chat
+﻿namespace Agentic.Chat.OpenAI
 {
     public interface IOpenAIChatClient : IChatClient
     {
