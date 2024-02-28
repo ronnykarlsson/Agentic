@@ -1,6 +1,7 @@
 ﻿using Agentic.Exceptions;
 using Agentic.Tools;
 using Agentic.Utilities;
+using SharpToken;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -126,7 +127,8 @@ namespace Agentic.Chat
 
         protected virtual int CalculateTokens(string message)
         {
-            return TokenHelpers.CalculateTokenCount(message);
+            if (string.IsNullOrEmpty(message)) return 0;
+            return GptEncoding.GetEncodingForModel("gpt-4").Encode(message).Count;
         }
     }
 }
