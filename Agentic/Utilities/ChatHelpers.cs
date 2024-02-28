@@ -77,7 +77,7 @@ namespace Agentic.Utilities
             var toolJson = JsonSerializer.Serialize(toolInfo, options);
             var toolExample = string.IsNullOrWhiteSpace(tool.Description) ? toolJson : $"{toolJson} ({tool.Description})";
 
-            return toolJson;
+            return toolExample;
         }
 
         private static object CreateDefault(Type type)

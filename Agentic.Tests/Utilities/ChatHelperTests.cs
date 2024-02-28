@@ -18,7 +18,7 @@ namespace Agentic.Tests.Utilities
             {
                 var pwshTool = new PwshTool();
                 var toolJson = ChatHelpers.GetToolJsonExample(pwshTool);
-                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"pwsh\",\"_description\":\"Executes a PowerShell script, file management, systems management, access external resources and anything else\",\"Script\":\"\"}"));
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"pwsh\",\"Script\":\"\\<Script\\>\"} (\"Executes a PowerShell script, file management, systems management, access external resources and anything else\")"));
             }
 
             [Test]
@@ -27,7 +27,25 @@ namespace Agentic.Tests.Utilities
                 var tool = new InlineTool("NewTool", "Description!", () => "");
 
                 var toolJson = ChatHelpers.GetToolJsonExample(tool);
-                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"_description\":\"Description!\"}"));
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\"} (Description!)"));
+            }
+
+            [Test]
+            public void SerializeInlineToolWithNullDescription()
+            {
+                var tool = new InlineTool("NewTool", "", () => "");
+
+                var toolJson = ChatHelpers.GetToolJsonExample(tool);
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\"}"));
+            }
+
+            [Test]
+            public void SerializeInlineToolWithEmptyDescription()
+            {
+                var tool = new InlineTool("NewTool", "", () => "");
+
+                var toolJson = ChatHelpers.GetToolJsonExample(tool);
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\"}"));
             }
 
             [Test]
@@ -36,7 +54,7 @@ namespace Agentic.Tests.Utilities
                 var tool = new InlineTool<string>("NewTool", "Description!", parameter => "");
 
                 var toolJson = ChatHelpers.GetToolJsonExample(tool);
-                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"_description\":\"Description!\",\"Parameter\":\"\"}"));
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"Parameter\":\"\\<Parameter\\>\"} (Description!)"));
             }
 
             [Test]
@@ -45,7 +63,7 @@ namespace Agentic.Tests.Utilities
                 var tool = new InlineTool<string, int>("NewTool", "Description!", (p1, p2) => "");
 
                 var toolJson = ChatHelpers.GetToolJsonExample(tool);
-                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"_description\":\"Description!\",\"Parameter1\":\"\",\"Parameter2\":0}"));
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"Parameter1\":\"\\<Parameter1\\>\",\"Parameter2\":0} (Description!)"));
             }
 
             [Test]
@@ -54,7 +72,7 @@ namespace Agentic.Tests.Utilities
                 var tool = new InlineTool<ComplexTestParameter>("NewTool", "Description!", parameter => "");
 
                 var toolJson = ChatHelpers.GetToolJsonExample(tool);
-                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"_description\":\"Description!\",\"Parameter\":{\"Parameter1\":\"\",\"Parameter2\":0}}"));
+                Assert.That(toolJson, Is.EqualTo("{\"Tool\":\"NewTool\",\"Parameter\":{\"Parameter1\":\"\",\"Parameter2\":0}} (Description!)"));
             }
         }
 
