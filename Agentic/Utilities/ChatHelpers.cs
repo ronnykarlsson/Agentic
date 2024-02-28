@@ -42,8 +42,7 @@ namespace Agentic.Utilities
             var toolType = tool.GetType();
             var toolInfo = new Dictionary<string, object>
             {
-                [nameof(tool.Tool)] = tool.Tool,
-                ["_description"] = tool.Description
+                [nameof(tool.Tool)] = tool.Tool
             };
 
             var properties = toolType.GetProperties()
@@ -74,7 +73,11 @@ namespace Agentic.Utilities
             }
 
             var options = new JsonSerializerOptions { WriteIndented = false };
-            return JsonSerializer.Serialize(toolInfo, options);
+
+            var toolJson = JsonSerializer.Serialize(toolInfo, options);
+            var toolExample = string.IsNullOrWhiteSpace(tool.Description) ? toolJson : $"{toolJson} ({tool.Description})";
+
+            return toolJson;
         }
 
         private static object CreateDefault(Type type)
