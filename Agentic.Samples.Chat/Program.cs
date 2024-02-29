@@ -26,6 +26,8 @@ namespace Agentic.Sample.Chat
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             var chatService = serviceProvider.GetService<IChatService>();
+
+            if (chatService == null) throw new InvalidOperationException($"{nameof(IChatService)} not found");
             chatService.StartChat();
         }
     }
