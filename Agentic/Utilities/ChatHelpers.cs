@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -72,8 +73,7 @@ namespace Agentic.Utilities
                 }
             }
 
-            var options = new JsonSerializerOptions { WriteIndented = false };
-
+            var options = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             var toolJson = JsonSerializer.Serialize(toolInfo, options);
             var toolExample = string.IsNullOrWhiteSpace(tool.Description) ? toolJson : $"{toolJson} ({tool.Description})";
 
@@ -144,7 +144,9 @@ namespace Agentic.Utilities
                 toolProperties[property.Name] = value ?? CreateDefault(valueType);
             }
 
-            return JsonSerializer.Serialize(toolProperties).Replace("\\u0022", "\\\"");
+            var options = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var json = JsonSerializer.Serialize(toolProperties).Replace("\\u0022", "\\\"");
+            return json;
         }
 
         public static IList<ITool> ParseTools(ITool[] tools, string message)
