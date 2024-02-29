@@ -4,6 +4,7 @@ using Agentic.Tools.Confirmation;
 using Agentic.Utilities;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Agentic.Agents
@@ -95,7 +96,7 @@ namespace Agentic.Agents
                     if (tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
                     var toolResponse = tool.Invoke();
-                    toolResponse = ToolHelpers.StripAnsiColorCodes(toolResponse);
+                    toolResponse = StripAnsiColorCodes(toolResponse);
                     toolResponse = _client.LimitMessageSize(toolResponse, LimitToolResponseSize);
                     _chatContext.AddMessage(Role.User, toolResponse);
                     OnChatResponse(new ChatResponseEventArgs
@@ -117,6 +118,13 @@ namespace Agentic.Agents
             }
 
             return response.Content;
+        }
+
+        private string StripAnsiColorCodes(string text)
+        {
+            // ANSI color code pattern
+            var ansiCodePattern = @"\x1B\[[0-9;]*m";
+            return Regex.Replace(text, ansiCodePattern, string.Empty);
         }
 
         private void OnChatResponse(ChatResponseEventArgs eventArgs)
