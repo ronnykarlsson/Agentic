@@ -103,10 +103,9 @@ namespace Agentic.Chat
             var addMessages = new List<ChatMessage>();
 
             var tokensLeft = tokens;
-            for (int i = context.Messages.Count - 1; i >= 0; i--)
-            {
-                var chatMessage = context.Messages[i];
 
+            foreach (var chatMessage in context.Messages.GetReverseEnumerator())
+            {
                 tokensLeft -= CalculateTokens(chatMessage);
                 if (tokensLeft <= 0) break;
 
