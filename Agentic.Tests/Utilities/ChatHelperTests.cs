@@ -215,7 +215,7 @@ namespace Agentic.Tests.Utilities
 
         public class ComplexTestParameter
         {
-            public string Parameter1 { get; set; }
+            public required string Parameter1 { get; set; }
             public int Parameter2 { get; set; }
         }
     }

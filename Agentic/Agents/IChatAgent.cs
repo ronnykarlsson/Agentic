@@ -7,12 +7,35 @@ namespace Agentic.Agents
 {
     public interface IChatAgent
     {
+        /// <summary>
+        /// Callback for each chat response.
+        /// </summary>
         event EventHandler<ChatResponseEventArgs> ChatResponse;
-        Task<string> ChatAsync(string message);
+
+        /// <summary>
+        /// Initialize the agent with system message and tools.
+        /// </summary>
+        /// <param name="systemMessage">System message to set.</param>
+        /// <param name="tools">Tools which the agent can use.</param>
         void Initialize(string systemMessage, params ITool[] tools);
-        void SetSystemMessage(string systemMessage);
-        void SetTools(ITool[] tools);
+
+        /// <summary>
+        /// Send <paramref name="message"/> to the chat client and return the response.
+        /// </summary>
+        /// <param name="message">Message to send</param>
+        /// <returns>Response from agent</returns>
+        Task<string> ChatAsync(string message);
+
+        /// <summary>
+        /// Get the chat context.
+        /// </summary>
+        /// <returns><see cref="ChatContext"/></returns>
         ChatContext GetContext();
+
+        /// <summary>
+        /// Set the chat context.
+        /// </summary>
+        /// <param name="context">Set <paramref name="context"/> for the agent.</param>
         void SetContext(ChatContext context);
     }
 }

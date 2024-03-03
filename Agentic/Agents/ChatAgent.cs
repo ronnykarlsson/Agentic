@@ -11,6 +11,7 @@ namespace Agentic.Agents
 {
     public class ChatAgent : IChatAgent
     {
+        /// <inheritdoc/>
         public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
         /// <summary>
@@ -36,23 +37,15 @@ namespace Agentic.Agents
             _chatContext = new ChatContext();
         }
 
+        /// <inheritdoc/>
         public void Initialize(string systemMessage, params ITool[] tools)
         {
-            SetSystemMessage(systemMessage);
-            SetTools(tools);
-        }
-
-        public void SetSystemMessage(string systemMessage)
-        {
             _client.SetSystemMessage(systemMessage);
-        }
-
-        public void SetTools(ITool[] tools)
-        {
             _tools = tools;
             _client.SetTools(tools);
         }
 
+        /// <inheritdoc/>
         public async Task<string> ChatAsync(string message)
         {
             if (!string.IsNullOrWhiteSpace(message))
@@ -120,6 +113,18 @@ namespace Agentic.Agents
             return response.Content;
         }
 
+        /// <inheritdoc/>
+        public ChatContext GetContext()
+        {
+            return _chatContext;
+        }
+
+        /// <inheritdoc/>
+        public void SetContext(ChatContext context)
+        {
+            _chatContext = context;
+        }
+
         private string StripAnsiColorCodes(string text)
         {
             // ANSI color code pattern
@@ -130,16 +135,6 @@ namespace Agentic.Agents
         private void OnChatResponse(ChatResponseEventArgs eventArgs)
         {
             ChatResponse?.Invoke(this, eventArgs);
-        }
-
-        public ChatContext GetContext()
-        {
-            return _chatContext;
-        }
-
-        public void SetContext(ChatContext context)
-        {
-            _chatContext = context;
         }
     }
 }
