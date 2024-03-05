@@ -17,7 +17,7 @@ namespace Agentic.Utilities
         {
             if (tools == null || !tools.Any()) return systemMessage;
 
-            var endingChatMessage = $"When you have finished ALL your current tasks successfully as asked for, or require my input, you MUST say '{ChatEndString}' to let me know that you are done.";
+            var endingChatMessage = $"When you have answered ALL questions and finished ALL your current tasks successfully as asked for, or require my input, you MUST say '{ChatEndString}' to let me know that you are done.";
 
             var toolMessage = GetToolJsonExample(tools);
             string toolString = tools.Length == 1 ? "tool" : "tools";

@@ -50,7 +50,7 @@ namespace Agentic.Agents
         {
             if (!string.IsNullOrWhiteSpace(message))
             {
-                _chatContext.AddMessage(Role.User, $"Your task: {message}");
+                _chatContext.AddMessage(Role.User, message);
             }
 
             var nonToolResponses = 0;
