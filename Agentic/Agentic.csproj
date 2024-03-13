@@ -19,6 +19,7 @@
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.41.2" />
     <PackageReference Include="SharpToken" Version="1.2.17" />
     <PackageReference Include="System.Text.Json" Version="8.0.2" />
   </ItemGroup>

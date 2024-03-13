@@ -1,5 +1,6 @@
 ﻿using Agentic.Agents;
 using Agentic.Tools;
+using Agentic.Tools.Browser;
 
 namespace Agentic.Sample.Chat
 {
@@ -14,7 +15,11 @@ namespace Agentic.Sample.Chat
 
         public void StartChat()
         {
-            var toolbox = new Toolbox(new PwshTool());
+            var toolbox = new Toolbox(
+                new PwshTool(),
+                new BrowserGotoTool(),
+                new BrowserClickTool(),
+                new BrowserTextInputTool());
 
             var chatAgent = _chatAgentFactory.Create();
 
