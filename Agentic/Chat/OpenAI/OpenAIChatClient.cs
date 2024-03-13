@@ -24,12 +24,12 @@ namespace Agentic.Chat.OpenAI
             _model = configuration["OpenAI:Model"] ?? "gpt-4-turbo-preview";
         }
 
-        public OpenAIChatClient(IOpenAIClient client, string model, int maxTokens, params ITool[] tools)
+        public OpenAIChatClient(IOpenAIClient client, string model, int maxTokens, Toolbox toolbox)
             : base(maxTokens)
         {
             _client = client;
             _model = model;
-            Tools = tools;
+            Toolbox = toolbox;
         }
 
         public override async Task<ChatMessage> SendRequestAsync(OpenAIRequest request)

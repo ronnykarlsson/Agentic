@@ -1,26 +1,76 @@
-﻿using Agentic.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
-namespace Agentic.Utilities
+namespace Agentic.Tools
 {
-    public static class ChatHelpers
+    public class Toolbox
     {
-        public static string ChatEndString { get; } = "---END---";
+        private readonly ITool[] _tools;
 
-        public static string CreateDefaultSystemMessage(string systemMessage, ITool[] tools)
+        public string ChatEndString => "---END---";
+
+
+        public Toolbox(params ITool[] tools)
         {
-            if (tools == null || !tools.Any()) return systemMessage;
+            _tools = tools;
+        }
+
+        public IList<ITool> ParseTools(string message)
+        {
+            var parsedTools = new List<ITool>();
+            var validJsonElements = ExtractAndValidateJsonStrings(message);
+
+            foreach (var tool in _tools)
+            {
+                var elements = validJsonElements.Where(e => e.TryGetProperty(nameof(ITool.Tool), out _));
+                if (!elements.Any()) continue;
+
+                var element = elements.First();
+                var toolName = element.GetProperty(nameof(ITool.Tool)).GetString();
+                if (tool.Tool != toolName) continue;
+
+                // Process each property of the tool
+                foreach (var property in tool.GetType().GetProperties())
+                {
+                    if (!property.PropertyType.IsGenericType || property.PropertyType.GetGenericTypeDefinition() != typeof(ToolParameter<>))
+                        continue;
+
+                    var parameterType = property.PropertyType.GetGenericArguments()[0];
+                    if (element.TryGetProperty(property.Name, out JsonElement parameterElement))
+                    {
+                        // Deserialize parameter value from JSON
+                        dynamic parameterValue = JsonSerializer.Deserialize(parameterElement.GetRawText(), parameterType);
+                        dynamic toolParameterInstance = Activator.CreateInstance(property.PropertyType);
+                        toolParameterInstance.Value = parameterValue;
+                        property.SetValue(tool, toolParameterInstance);
+                    }
+                    else
+                    {
+                        // Set default value for properties not included in the JSON
+                        dynamic toolParameterInstance = Activator.CreateInstance(property.PropertyType);
+                        dynamic defaultValue = parameterType.IsValueType ? Activator.CreateInstance(parameterType) : null;
+                        toolParameterInstance.Value = defaultValue;
+                        property.SetValue(tool, toolParameterInstance);
+                    }
+                }
+                parsedTools.Add(tool);
+            }
+
+            return parsedTools;
+        }
+
+        public string CreateDefaultSystemMessage(string systemMessage)
+        {
+            if (_tools == null || !_tools.Any()) return systemMessage;
 
             var endingChatMessage = $"When you have answered ALL questions and finished ALL your current tasks successfully as asked for, or require my input, you MUST say '{ChatEndString}' to let me know that you are done.";
 
-            var toolMessage = GetToolJsonExample(tools);
-            string toolString = tools.Length == 1 ? "tool" : "tools";
+            var toolMessage = GetToolJsonExample();
+            string toolString = _tools.Length == 1 ? "tool" : "tools";
 
             var toolSystemMessage = $"If you need to use a tool, don't say anything else, only use the tool. You MUST use your {toolString} to overcome any of your limitations, find information needed and perform actions required to complete your task. You have access to the following {toolString} which you invoke using this JSON schema:{Environment.NewLine}{toolMessage}";
 
@@ -29,16 +79,16 @@ namespace Agentic.Utilities
             return finalSystemMessage;
         }
 
-        public static string GetToolJsonExample(ICollection<ITool> tools)
+        public string GetToolJsonExample()
         {
-            if (tools == null || !tools.Any()) return string.Empty;
+            if (_tools == null || !_tools.Any()) return string.Empty;
 
-            var toolMessage = string.Join(Environment.NewLine, tools.Select(GetToolJsonExample));
+            var toolMessage = string.Join(Environment.NewLine, _tools.Select(GetToolJsonExample));
 
             return toolMessage;
         }
 
-        public static string GetToolJsonExample(ITool tool)
+        public string GetToolJsonExample(ITool tool)
         {
             var toolType = tool.GetType();
             var toolInfo = new Dictionary<string, object>
@@ -80,35 +130,10 @@ namespace Agentic.Utilities
             return toolExample;
         }
 
-        private static object CreateDefault(Type type)
+        public string GetToolInvocationMessage(ITool tool)
         {
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            else if (type == typeof(string))
-            {
-                return "";
-            }
-            else
-            {
-                // Handling complex object creation and initialization
-                var instance = Activator.CreateInstance(type);
-                foreach (var prop in type.GetProperties().Where(p => p.CanWrite))
-                {
-                    var propDefaultValue = CreateDefault(prop.PropertyType);
-                    prop.SetValue(instance, propDefaultValue);
-                }
-                return instance;
-            }
-        }
-
-        public static string GetToolInvocationMessage(ICollection<ITool> tools)
-        {
-            if (tools == null || !tools.Any()) return string.Empty;
-
-            var toolsMessage = string.Join(Environment.NewLine, tools.Select(GetToolJson));
-            return toolsMessage;
+            if (tool == null) throw new ArgumentNullException(nameof(tool));
+            return GetToolJson(tool);
         }
 
         public static string GetToolJson(ITool tool)
@@ -149,57 +174,30 @@ namespace Agentic.Utilities
             return json;
         }
 
-        public static IList<ITool> ParseTools(ITool[] tools, string message)
+        private static object CreateDefault(Type type)
         {
-            var parsedTools = new List<ITool>();
-            var validJsonElements = ExtractAndValidateJsonStrings(message);
-
-            foreach (var tool in tools)
+            if (type.IsValueType)
             {
-                var elements = validJsonElements.Where(e => e.TryGetProperty(nameof(ITool.Tool), out _));
-                if (!elements.Any()) continue;
-
-                var element = elements.First();
-                var toolName = element.GetProperty(nameof(ITool.Tool)).GetString();
-                if (tool.Tool != toolName) continue;
-
-                // Process each property of the tool
-                foreach (var property in tool.GetType().GetProperties())
-                {
-                    if (!property.PropertyType.IsGenericType || property.PropertyType.GetGenericTypeDefinition() != typeof(ToolParameter<>))
-                        continue;
-
-                    var parameterType = property.PropertyType.GetGenericArguments()[0];
-                    if (element.TryGetProperty(property.Name, out JsonElement parameterElement))
-                    {
-                        // Deserialize parameter value from JSON
-                        dynamic parameterValue = JsonSerializer.Deserialize(parameterElement.GetRawText(), parameterType);
-                        dynamic toolParameterInstance = Activator.CreateInstance(property.PropertyType);
-                        toolParameterInstance.Value = parameterValue;
-                        property.SetValue(tool, toolParameterInstance);
-                    }
-                    else
-                    {
-                        // Set default value for properties not included in the JSON
-                        dynamic toolParameterInstance = Activator.CreateInstance(property.PropertyType);
-                        dynamic defaultValue = parameterType.IsValueType ? Activator.CreateInstance(parameterType) : null;
-                        toolParameterInstance.Value = defaultValue;
-                        property.SetValue(tool, toolParameterInstance);
-                    }
-                }
-                parsedTools.Add(tool);
+                return Activator.CreateInstance(type);
             }
-
-            return parsedTools;
+            else if (type == typeof(string))
+            {
+                return "";
+            }
+            else
+            {
+                // Handling complex object creation and initialization
+                var instance = Activator.CreateInstance(type);
+                foreach (var prop in type.GetProperties().Where(p => p.CanWrite))
+                {
+                    var propDefaultValue = CreateDefault(prop.PropertyType);
+                    prop.SetValue(instance, propDefaultValue);
+                }
+                return instance;
+            }
         }
 
-        public static string RemoveChatEndString(string content)
-        {
-            var updatedContent = Regex.Replace(content, $"['\"]?{ChatEndString}['\"]?", "");
-            return updatedContent;
-        }
-
-        private static List<JsonElement> ExtractAndValidateJsonStrings(string input)
+        private List<JsonElement> ExtractAndValidateJsonStrings(string input)
         {
             var validJsonElements = new List<JsonElement>();
             int braceCount = 0;

@@ -23,12 +23,12 @@ namespace Agentic.Chat.Ollama
             _model = configuration["Ollama:Model"] ?? "orca2";
         }
 
-        public OllamaChatClient(IOllamaClient client, string model, int maxTokens, params ITool[] tools)
+        public OllamaChatClient(IOllamaClient client, string model, int maxTokens, Toolbox toolbox)
             : base(maxTokens)
         {
             _client = client;
             _model = model;
-            Tools = tools;
+            Toolbox = toolbox;
         }
 
         public override async Task<ChatMessage> SendRequestAsync(OllamaRequest request)

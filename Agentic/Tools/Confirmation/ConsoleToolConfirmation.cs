@@ -1,5 +1,4 @@
-﻿using Agentic.Utilities;
-using System;
+﻿using System;
 
 namespace Agentic.Tools.Confirmation
 {
@@ -7,7 +6,7 @@ namespace Agentic.Tools.Confirmation
     {
         public bool Confirm(ITool tool)
         {
-            Console.WriteLine($"Confirm {tool.Tool}: {ChatHelpers.GetToolJson(tool)}");
+            Console.WriteLine($"Confirm {tool.Tool}: {Toolbox.GetToolJson(tool)}");
             Console.WriteLine($"Continue with tool?");
 
             Console.Write("[Y] Yes  [N] No  (default is \"Y\"): ");

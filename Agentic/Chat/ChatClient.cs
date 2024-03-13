@@ -1,6 +1,5 @@
 ﻿using Agentic.Exceptions;
 using Agentic.Tools;
-using Agentic.Utilities;
 using SharpToken;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ namespace Agentic.Chat
     public abstract class ChatClient<TRequest> : IChatClient
     {
         protected string SystemMessage;
-        protected ITool[] Tools;
+        protected Toolbox Toolbox;
 
         public int MaxTokens { get; }
 
@@ -33,7 +32,7 @@ namespace Agentic.Chat
 
             var request = CreateRequest();
 
-            var toolsSystemMessage = ChatHelpers.CreateDefaultSystemMessage(SystemMessage, Tools);
+            var toolsSystemMessage = Toolbox.CreateDefaultSystemMessage(SystemMessage);
             var systemMessage = new ChatMessage(Role.System, toolsSystemMessage);
             AddRequestMessage(request, systemMessage);
 
@@ -53,7 +52,7 @@ namespace Agentic.Chat
             }
 
             // Calculate max tokens with system message tokens
-            var toolsSystemMessage = ChatHelpers.CreateDefaultSystemMessage(SystemMessage, Tools);
+            var toolsSystemMessage = Toolbox.CreateDefaultSystemMessage(SystemMessage);
             var systemMessage = new ChatMessage(Role.System, toolsSystemMessage);
             var tokens = MaxTokens - CalculateTokens(systemMessage);
 
@@ -93,9 +92,9 @@ namespace Agentic.Chat
             return message.Substring(0, (int) newMessageSize) + "...";
         }
 
-        public void SetTools(ITool[] tools)
+        public void SetTools(Toolbox toolbox)
         {
-            Tools = tools;
+            Toolbox = toolbox;
         }
 
         private void AddRequestMessages(ChatContext context, TRequest request, int tokens)

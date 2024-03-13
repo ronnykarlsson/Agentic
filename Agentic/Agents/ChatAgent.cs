@@ -1,7 +1,6 @@
 ﻿using Agentic.Chat;
 using Agentic.Tools;
 using Agentic.Tools.Confirmation;
-using Agentic.Utilities;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -28,7 +27,7 @@ namespace Agentic.Agents
         private readonly IToolConfirmation _toolConfirmation;
 
         private ChatContext _chatContext;
-        private ITool[] _tools;
+        private Toolbox _toolbox;
 
         public ChatAgent(IChatClient client, IToolConfirmation toolConfirmation)
         {
@@ -38,11 +37,11 @@ namespace Agentic.Agents
         }
 
         /// <inheritdoc/>
-        public void Initialize(string systemMessage, params ITool[] tools)
+        public void Initialize(string systemMessage, Toolbox toolbox)
         {
             _client.SetSystemMessage(systemMessage);
-            _tools = tools;
-            _client.SetTools(tools);
+            _toolbox = toolbox;
+            _client.SetTools(toolbox);
         }
 
         /// <inheritdoc/>
@@ -64,14 +63,14 @@ namespace Agentic.Agents
                 previousResponse = response;
                 response = await _client.SendAsync(_chatContext).ConfigureAwait(false);
 
-                var isEnded = response.Content.Contains(ChatHelpers.ChatEndString) || response.Content.EndsWith("?");
-                response.Content = ChatHelpers.RemoveChatEndString(response.Content);
+                var isEnded = response.Content.Contains(_toolbox.ChatEndString) || response.Content.EndsWith("?");
+                response.Content = Regex.Replace(response.Content, $"['\"]?{_toolbox.ChatEndString}['\"]?", "");
 
-                var tool = ChatHelpers.ParseTools(_tools, response.Content).FirstOrDefault();
+                var tool = _toolbox.ParseTools(response.Content).FirstOrDefault();
 
                 if (tool != null)
                 {
-                    var toolInvocationMessage = ChatHelpers.GetToolInvocationMessage(new[] { tool });
+                    var toolInvocationMessage = _toolbox.GetToolInvocationMessage(tool);
                     response.Content = toolInvocationMessage;
                 }
 
