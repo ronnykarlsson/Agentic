@@ -1,4 +1,6 @@
-﻿namespace Agentic.Tools.Browser
+﻿using Microsoft.Playwright;
+
+namespace Agentic.Tools.Browser
 {
     public class BrowserClickTool : BrowserTool
     {
@@ -13,11 +15,25 @@
                 return "Error: Element Id is not provided.";
             }
 
-            var selector = Id.Value.StartsWith("#") ? Id.Value : $"#{Id.Value}";
+            var selector = GetIdSelector(Id.Value);
 
-            Page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
+            try
+            {
+                Page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
+            }
+            catch (PlaywrightException ex)
+            {
+                return $"Error: {ex.Message}";
+            }
 
-            Page.ClickAsync(selector).GetAwaiter().GetResult();
+            try
+            {
+                Page.ClickAsync(selector).GetAwaiter().GetResult();
+            }
+            catch (PlaywrightException ex)
+            {
+                return $"Error: {ex.Message}";
+            }
 
             return ReadPage(Page);
         }

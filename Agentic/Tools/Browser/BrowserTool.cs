@@ -1,4 +1,8 @@
 ﻿using Microsoft.Playwright;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Agentic.Tools.Browser
 {
@@ -22,97 +26,32 @@ namespace Agentic.Tools.Browser
             set { BrowserContext.Page = value; }
         }
 
+        protected string GetIdSelector(string id)
+        {
+            var selector = id.StartsWith("#") ? id : $"#{id}";
+            return selector;
+        }
+
         protected string ReadPage(IPage page)
         {
+            page.WaitForSelectorAsync("body").GetAwaiter().GetResult();
+
             var title = page.TitleAsync().GetAwaiter().GetResult();
 
-            var contentScript = @"
-(function() {
-    const isVisible = (el) => {
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0' || style.fontSize === '0px') return false;
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return false;
-        return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === el;
-    };
+            string contentScript;
 
-    const generateUniqueId = (el) => {
-        if (el.id) return el.id;
-        const uniqueId = '_id_' + Math.random().toString(36).substr(2, 9);
-        el.id = uniqueId;
-        return uniqueId;
-    };
-
-    const formatElementText = (el) => {
-        let text = el.innerText; // Removed the trim here for safety
-        if (text === undefined) return ''; // Check for undefined explicitly
-        text = text.trim(); // Perform the trim after the check
-        const id = generateUniqueId(el);
-        if (el.tagName.toLowerCase() === 'a' || el.tagName.toLowerCase() === 'button' || el.tagName.toLowerCase() === 'input') {
-            return `[${text}](#${id})`;
-        }
-        return text;
-    };
-
-    const uniqueTexts = new Map();
-
-    document.querySelectorAll('body *:not(script):not(style)').forEach(el => {
-        if (!isVisible(el)) return;
-
-        const text = formatElementText(el);
-        if (text.length <= 1) return;
-
-        const path = [];
-        let parent = el;
-        while (parent !== document.body) {
-            path.unshift(`${parent.tagName.toLowerCase()}${parent.className ? '.' + parent.className.split(' ').join('.') : ''}`);
-            parent = parent.parentNode;
-        }
-
-        const selector = path.join(' > ');
-        if (!uniqueTexts.has(selector)) {
-            uniqueTexts.set(selector, text);
-        }
-    });
-
-    return JSON.stringify(Array.from(uniqueTexts.values()).join('\\n\\n'));
-})();
-";
+            var resourceManifestName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Single(m => m.EndsWith(".browserPageContent.js"));
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceManifestName))
+            {
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    contentScript = reader.ReadToEnd();
+                }
+            }
 
             var textContent = page.EvaluateAsync<string>(contentScript).GetAwaiter().GetResult();
 
-            var elementsScript = @"
-(function() {
-    const isVisible = (el) => {
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden') return false;
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return false;
-        return true;
-    };
-
-    const generateRandomId = () => '_id_' + Math.random().toString(36).substr(2, 9);
-
-    const elements = document.querySelectorAll('a, button, input:not([type=hidden]), textarea, select, [tabindex]:not([tabindex=""-1""])');
-    return JSON.stringify([...elements].filter(isVisible).map((el, index) => {
-        const textContent = el.innerText || el.value || el.title || '';
-        const text = textContent ? textContent.trim() : '';
-        let id = el.id;
-        if (!id) {
-            id = generateRandomId();
-            el.id = id; // Set the random ID on the element
-        }
-        const type = el.tagName.toLowerCase();
-        const href = el.tagName.toLowerCase() === 'a' ? el.getAttribute('href') : '';
-        if (href) return { type, text, id, href };
-        return { type, text, id };
-    }).filter(el => el.text && el.text.length > 0));
-})();
-";
-
-            var elements = page.EvaluateAsync<string>(elementsScript).GetAwaiter().GetResult();
-
-            var resultJson = $"{{\"title\": \"{title.Replace("\"", "\\\"")}\", \"textContent\": {textContent}, \"interactableElements\": {elements}}}";
+            var resultJson = $"{{\"title\": \"{title.Replace("\"", "\\\"")}\", \"textContent\": {textContent}}}";
 
             return resultJson;
         }

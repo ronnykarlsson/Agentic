@@ -1,4 +1,6 @@
-﻿namespace Agentic.Tools.Browser
+﻿using Microsoft.Playwright;
+
+namespace Agentic.Tools.Browser
 {
     public class BrowserTextInputTool : BrowserTool
     {
@@ -15,15 +17,37 @@
                 return "Error: Element Id is not provided.";
             }
 
-            var selector = Id.Value.StartsWith("#") ? Id.Value : $"#{Id.Value}";
+            var selector = GetIdSelector(Id.Value);
             var text = Text.Value ?? "";
 
-            Page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
-            Page.FillAsync(selector, text).GetAwaiter().GetResult();
+            try
+            {
+                Page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
+            }
+            catch (PlaywrightException ex)
+            {
+                return $"Error: {ex.Message}";
+            }
+
+            try
+            {
+                Page.FillAsync(selector, text).GetAwaiter().GetResult();
+            }
+            catch (PlaywrightException ex)
+            {
+                return $"Error: {ex.Message}";
+            }
 
             if (PressEnterAfterInput.Value)
             {
-                Page.PressAsync(selector, "Enter").GetAwaiter().GetResult();
+                try
+                {
+                    Page.PressAsync(selector, "Enter").GetAwaiter().GetResult();
+                }
+                catch (PlaywrightException ex)
+                {
+                    return $"Enter failed: {ex.Message}";
+                }
             }
 
             return ReadPage(Page);
