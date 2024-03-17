@@ -70,5 +70,37 @@ namespace Agentic.Clients.OpenAI
                 throw;
             }
         }
+
+        public async Task<OpenAIEmbeddingResponse> SendEmbeddingsRequestAsync(OpenAIEmbeddingRequest request)
+        {
+            var endpoint = $"{_baseUrl}/embeddings";
+
+            try
+            {
+                var payload = new
+                {
+                    model = request.Model,
+                    input = request.Input
+                };
+
+                var jsonContent = JsonSerializer.Serialize(payload);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(endpoint, content).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<OpenAIEmbeddingResponse>(responseContent);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger?.LogError($"HTTP Request failed: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"An unexpected error occurred: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

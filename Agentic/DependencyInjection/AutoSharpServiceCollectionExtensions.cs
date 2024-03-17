@@ -4,6 +4,8 @@ using Agentic.Chat.Ollama;
 using Agentic.Chat.OpenAI;
 using Agentic.Clients.Ollama;
 using Agentic.Clients.OpenAI;
+using Agentic.Embeddings;
+using Agentic.Embeddings.OpenAI;
 using Agentic.Tools.Confirmation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,7 @@ namespace Agentic.DependencyInjection
                 .AddScoped<IOpenAIClient, OpenAIClient>()
                 .AddTransient<IOpenAIChatClient, OpenAIChatClient>()
                 .AddScoped<IOpenAIChatClientFactory, OpenAIChatClientFactory>()
+                .AddTransient<IOpenAIEmbeddingsClient, OpenAIEmbeddingsClient>()
 
                 // Ollama
                 .AddScoped<IOllamaClient, OllamaClient>()
@@ -28,6 +31,7 @@ namespace Agentic.DependencyInjection
 
                 // Default Open AI
                 .AddScoped<IChatClientFactory, OpenAIChatClientFactory>()
+                .AddTransient<IEmbeddingsClient, OpenAIEmbeddingsClient>()
 
                 .AddTransient<IChatAgent, ChatAgent>()
                 .AddScoped<IChatAgentFactory, ChatAgentFactory>();
