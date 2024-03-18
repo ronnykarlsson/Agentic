@@ -6,6 +6,7 @@ using Agentic.Clients.Ollama;
 using Agentic.Clients.OpenAI;
 using Agentic.Embeddings;
 using Agentic.Embeddings.OpenAI;
+using Agentic.Profiles;
 using Agentic.Tools.Confirmation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,25 +17,28 @@ namespace Agentic.DependencyInjection
         public static IServiceCollection AddAgenticServices(this IServiceCollection services)
         {
             services
-                .AddScoped<IToolConfirmation, ConsoleToolConfirmation>()
+                .AddTransient<IToolConfirmation, ConsoleToolConfirmation>()
 
                 // Open AI
-                .AddScoped<IOpenAIClient, OpenAIClient>()
+                .AddTransient<IOpenAIClient, OpenAIClient>()
                 .AddTransient<IOpenAIChatClient, OpenAIChatClient>()
-                .AddScoped<IOpenAIChatClientFactory, OpenAIChatClientFactory>()
+                .AddTransient<IOpenAIChatClientFactory, OpenAIChatClientFactory>()
                 .AddTransient<IOpenAIEmbeddingsClient, OpenAIEmbeddingsClient>()
 
                 // Ollama
-                .AddScoped<IOllamaClient, OllamaClient>()
+                .AddTransient<IOllamaClient, OllamaClient>()
                 .AddTransient<IOllamaChatClient, OllamaChatClient>()
-                .AddScoped<IOllamaChatClientFactory, OllamaChatClientFactory>()
+                .AddTransient<IOllamaChatClientFactory, OllamaChatClientFactory>()
 
                 // Default Open AI
-                .AddScoped<IChatClientFactory, OpenAIChatClientFactory>()
+                .AddTransient<IChatClientFactory, OpenAIChatClientFactory>()
                 .AddTransient<IEmbeddingsClient, OpenAIEmbeddingsClient>()
 
                 .AddTransient<IChatAgent, ChatAgent>()
-                .AddScoped<IChatAgentFactory, ChatAgentFactory>();
+                .AddTransient<IChatAgentFactory, ChatAgentFactory>()
+
+                .AddTransient<IProfileLoader, ProfileLoader>()
+                .AddTransient<IAgenticFactory, AgenticFactory>();
 
             return services;
         }

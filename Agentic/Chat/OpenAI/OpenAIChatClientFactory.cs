@@ -1,4 +1,5 @@
 ﻿using Agentic.Clients.OpenAI;
+using Agentic.Profiles;
 using Microsoft.Extensions.Configuration;
 
 namespace Agentic.Chat.OpenAI
@@ -14,9 +15,16 @@ namespace Agentic.Chat.OpenAI
             _configuration = configuration;
         }
 
+        public string Name => "OpenAI";
+
         public IChatClient Create()
         {
             return new OpenAIChatClient(_client, _configuration);
+        }
+
+        public IChatClient Create(ClientSettings clientSettings)
+        {
+            return new OpenAIChatClient(_configuration, clientSettings);
         }
     }
 }

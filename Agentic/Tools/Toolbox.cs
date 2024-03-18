@@ -13,6 +13,7 @@ namespace Agentic.Tools
 
         public string ChatEndString => "---END---";
 
+        public static Toolbox Empty => new Toolbox();
 
         public Toolbox(params ITool[] tools)
         {

@@ -1,5 +1,6 @@
 ﻿using Agentic.Clients.Ollama;
 using Agentic.Exceptions;
+using Agentic.Profiles;
 using Agentic.Tools;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -21,6 +22,15 @@ namespace Agentic.Chat.Ollama
 
             _client = new OllamaClient(configuration, null);
             _model = configuration["Ollama:Model"] ?? "orca2";
+        }
+
+        public OllamaChatClient(ClientSettings clientSettings)
+            : base(clientSettings.Tokens)
+        {
+            if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
+
+            _client = new OllamaClient(clientSettings.ApiKey, clientSettings.BaseUrl ?? "http://127.0.0.1:11434");
+            _model = clientSettings.Model;
         }
 
         public OllamaChatClient(IOllamaClient client, string model, int maxTokens, Toolbox toolbox)

@@ -1,5 +1,6 @@
 ﻿using Agentic.Clients.OpenAI;
 using Agentic.Exceptions;
+using Agentic.Profiles;
 using Agentic.Tools;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -30,6 +31,16 @@ namespace Agentic.Chat.OpenAI
             _client = client;
             _model = model;
             Toolbox = toolbox;
+        }
+
+        public OpenAIChatClient(IConfiguration configuration, ClientSettings clientSettings)
+            : base(clientSettings.Tokens)
+        {
+            var apiKey = clientSettings.ApiKey ?? configuration["OpenAI:ApiKey"];
+            var baseUrl = clientSettings.BaseUrl ?? "https://api.openai.com/v1";
+
+            _client = new OpenAIClient(apiKey, baseUrl);
+            _model = clientSettings.Model;
         }
 
         public override async Task<ChatMessage> SendRequestAsync(OpenAIRequest request)

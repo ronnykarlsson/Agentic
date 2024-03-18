@@ -29,6 +29,12 @@ namespace Agentic.Agents
         private ChatContext _chatContext;
         private Toolbox _toolbox;
 
+        public ChatAgent(IChatClient client)
+        {
+            _client = client;
+            _chatContext = new ChatContext();
+        }
+
         public ChatAgent(IChatClient client, IToolConfirmation toolConfirmation)
         {
             _client = client;
@@ -85,7 +91,7 @@ namespace Agentic.Agents
 
                 if (tool != null)
                 {
-                    if (tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
+                    if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
                     var toolResponse = tool.Invoke();
                     toolResponse = StripAnsiColorCodes(toolResponse);

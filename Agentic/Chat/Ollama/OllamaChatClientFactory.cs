@@ -1,4 +1,5 @@
 ﻿using Agentic.Clients.Ollama;
+using Agentic.Profiles;
 using Microsoft.Extensions.Configuration;
 
 namespace Agentic.Chat.Ollama
@@ -14,9 +15,16 @@ namespace Agentic.Chat.Ollama
             _configuration = configuration;
         }
 
+        public string Name => "Ollama";
+
         public IChatClient Create()
         {
             return new OllamaChatClient(_client, _configuration);
+        }
+
+        public IChatClient Create(ClientSettings clientSettings)
+        {
+            return new OllamaChatClient(clientSettings);
         }
     }
 }
