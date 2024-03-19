@@ -30,41 +30,72 @@ namespace Agentic
         {
             if (profile == null) throw new ArgumentNullException(nameof(profile));
 
+            var agentSettings = profile.Agent;
+            var clientSettings = agentSettings.Client ?? profile.Client;
+
             var chatClientFactories = CreateInstances<IChatClientFactory>();
 
-            var clientSettings = profile.Agent.Client ?? profile.Client;
             var chatClientFactory = chatClientFactories.FirstOrDefault(m => m.Name == clientSettings.Name);
 
             var chatClient = chatClientFactory.Create(clientSettings);
 
-            var agentSettings = profile.Agent;
+            var toolbox = Toolbox.Empty;
+
+            if (agentSettings.Tools != null && agentSettings.Tools.Length > 0)
+            {
+                toolbox = CreateTools(agentSettings.Tools);
+            }
 
             var chatAgent = new ChatAgent(chatClient);
-            chatAgent.Initialize(agentSettings.Prompt, Toolbox.Empty);
+            chatAgent.Initialize(agentSettings.Prompt, toolbox);
 
             return chatAgent;
         }
 
-        private IReadOnlyList<T> CreateInstances<T>() where T : class
+        private Toolbox CreateTools(ToolDefinition[] toolDefinitions)
+        {
+            Toolbox toolbox;
+            var agentTools = new List<ITool>();
+
+            foreach (var tool in toolDefinitions)
+            {
+                var agentTool = CreateInstances<ITool>(tool.Name);
+
+                if (agentTool.Count == 0)
+                    throw new InvalidOperationException($"Tool {tool.Name} not found");
+
+                if (agentTool.Count > 1)
+                    throw new InvalidOperationException($"Multiple tools found with name {tool.Name}");
+
+                agentTools.Add(agentTool[0]);
+            }
+
+            toolbox = new Toolbox(agentTools.ToArray());
+            return toolbox;
+        }
+
+        private IReadOnlyList<T> CreateInstances<T>(string nameFilter = null)
+            where T : class
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            var chatAgentFactoryTypes = assemblies
+            var instanceTypes = assemblies
                 .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => nameFilter == null || type.Name.ToLowerInvariant() == nameFilter.ToLowerInvariant())
                 .Where(type => typeof(T).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 .ToList();
 
-            var chatAgentFactories = new List<T>();
-            foreach (var type in chatAgentFactoryTypes)
+            var instances = new List<T>();
+            foreach (var type in instanceTypes)
             {
                 var instance = ActivatorUtilities.CreateInstance(_serviceProvider, type) as T;
                 if (instance != null)
                 {
-                    chatAgentFactories.Add(instance);
+                    instances.Add(instance);
                 }
             }
 
-            return chatAgentFactories;
+            return instances;
         }
     }
 }
