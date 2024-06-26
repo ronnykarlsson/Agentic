@@ -6,5 +6,6 @@ namespace Agentic.Agents
     {
         public string Response { get; set; }
         public bool IsTool { get; set; }
+        public ChatAgent Agent { get; set; }
     }
 }

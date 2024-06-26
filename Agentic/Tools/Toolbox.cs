@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Agentic.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,13 @@ namespace Agentic.Tools
 {
     public class Toolbox
     {
-        private readonly ITool[] _tools;
+        private ITool[] _tools;
 
         public string ChatEndString => "---END---";
 
         public static Toolbox Empty => new Toolbox();
+
+        public ITool[] Tools => _tools;
 
         public Toolbox(params ITool[] tools)
         {
@@ -23,7 +26,7 @@ namespace Agentic.Tools
         public IList<ITool> ParseTools(string message)
         {
             var parsedTools = new List<ITool>();
-            var validJsonElements = ExtractAndValidateJsonStrings(message);
+            var validJsonElements = JsonHelpers.ExtractJsonElements(message);
 
             foreach (var tool in _tools)
             {
@@ -175,6 +178,12 @@ namespace Agentic.Tools
             return json;
         }
 
+        public void AddTool(ITool tool)
+        {
+            // Add or replace the tool in the toolbox
+            _tools = _tools.Where(t => t.GetType() != tool.GetType()).ToArray().Concat(new[] { tool }).ToArray();
+        }
+
         private static object CreateDefault(Type type)
         {
             if (type.IsValueType)
@@ -196,64 +205,6 @@ namespace Agentic.Tools
                 }
                 return instance;
             }
-        }
-
-        private List<JsonElement> ExtractAndValidateJsonStrings(string input)
-        {
-            var validJsonElements = new List<JsonElement>();
-            int braceCount = 0;
-            StringBuilder currentJson = new StringBuilder();
-            bool insideString = false;
-            char lastChar = '\0';
-
-            foreach (char c in input)
-            {
-                // Toggle insideString flag if we encounter a double-quote that is not escaped
-                if (c == '"' && lastChar != '\\')
-                {
-                    insideString = !insideString;
-                }
-
-                if (!insideString)
-                {
-                    if (c == '{')
-                    {
-                        braceCount++;
-                        if (braceCount == 1)
-                        {
-                            currentJson.Clear();
-                        }
-                    }
-                    else if (c == '}')
-                    {
-                        braceCount--;
-                        if (braceCount == 0)
-                        {
-                            currentJson.Append(c);
-                            try
-                            {
-                                // Attempt to validate and deserialize the JSON string
-                                var jsonElement = JsonSerializer.Deserialize<JsonElement>(currentJson.ToString());
-                                validJsonElements.Add(jsonElement);
-                            }
-                            catch (JsonException)
-                            {
-                                // If deserialization fails, the JSON is not valid, so it's ignored
-                            }
-                            continue;
-                        }
-                    }
-                }
-
-                if (braceCount > 0)
-                {
-                    currentJson.Append(c);
-                }
-
-                lastChar = c; // Keep track of the last character for escaped quote handling
-            }
-
-            return validJsonElements;
         }
     }
 }

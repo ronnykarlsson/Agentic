@@ -248,3 +248,19 @@ dotnet_naming_symbols.protected_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_fields.applicable_accessibilities = protected, protected_internal
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+
+
+# YAML files
+[*.yml]
+
+#### Core EditorConfig Options ####
+
+# Indentation and spacing
+indent_size = 2
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = false

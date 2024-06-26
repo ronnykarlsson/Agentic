@@ -31,22 +31,77 @@ namespace Agentic
             if (profile == null) throw new ArgumentNullException(nameof(profile));
 
             var agentSettings = profile.Agent;
-            var clientSettings = agentSettings.Client ?? profile.Client;
+            var defaultClientSettings = profile.Client;
 
+            var chatAgent = CreateAgent(agentSettings, defaultClientSettings);
+
+            return chatAgent;
+        }
+
+        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings)
+        {
+            var clientSettings = agentSettings.Client ?? defaultClientSettings;
+
+            // Create client to use for the agent
             var chatClientFactories = CreateInstances<IChatClientFactory>();
-
             var chatClientFactory = chatClientFactories.FirstOrDefault(m => m.Name == clientSettings.Name);
-
             var chatClient = chatClientFactory.Create(clientSettings);
 
+            // Create toolbox for the agent
             var toolbox = Toolbox.Empty;
-
             if (agentSettings.Tools != null && agentSettings.Tools.Length > 0)
             {
                 toolbox = CreateTools(agentSettings.Tools);
             }
 
             var chatAgent = new ChatAgent(chatClient);
+            chatAgent.Name = agentSettings.Name;
+
+            // Create partner agents and assign chat tool
+            if (agentSettings.Partners?.Length > 0)
+            {
+                var partners = new List<IChatAgent>();
+
+                foreach (var partner in agentSettings.Partners)
+                {
+                    var partnerAgent = CreateAgent(partner, defaultClientSettings);
+
+                    partnerAgent.ChatResponse += (sender, e) =>
+                    {
+                        chatAgent.OnChatResponse(new ChatResponseEventArgs
+                        {
+                            Response = e.Response,
+                            IsTool = e.IsTool,
+                            Agent = partnerAgent
+                        });
+                    };
+
+                    partners.Add(partnerAgent);
+                }
+
+                var chatTool = new ChatTool(partners);
+                toolbox.AddTool(chatTool);
+
+                foreach (var partner in partners)
+                {
+                    // Add partners to each other's chat tool
+                    var partnerChatTool = partner.Toolbox.Tools.FirstOrDefault(t => t is ChatTool) as ChatTool;
+                    if (partnerChatTool == null)
+                    {
+                        partnerChatTool = new ChatTool(partners);
+                    }
+                    else
+                    {
+                        var ignorePartnerNames = partnerChatTool.Agents.Select(a => a.Name).ToArray();
+                        var chatPartners = partners.Where(p => !ignorePartnerNames.Contains(p.Name)).ToArray();
+                        var newChatPartners = chatPartners.Concat(partnerChatTool.Agents).ToArray();
+                        partnerChatTool = new ChatTool(newChatPartners);
+                    }
+
+                    partner.Toolbox.AddTool(partnerChatTool);
+                }
+            }
+
             chatAgent.Initialize(agentSettings.Prompt, toolbox);
 
             return chatAgent;

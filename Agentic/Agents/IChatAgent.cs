@@ -8,9 +8,19 @@ namespace Agentic.Agents
     public interface IChatAgent
     {
         /// <summary>
+        /// Name of this agent.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Callback for each chat response.
         /// </summary>
         event EventHandler<ChatResponseEventArgs> ChatResponse;
+
+        /// <summary>
+        /// Toolbox used by the agent.
+        /// </summary>
+        Toolbox Toolbox { get; }
 
         /// <summary>
         /// Initialize the agent with system message and tools.

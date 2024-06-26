@@ -2,6 +2,7 @@
 using Agentic.Tools;
 using Agentic.Tools.Confirmation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ namespace Agentic.Agents
     public class ChatAgent : IChatAgent
     {
         /// <inheritdoc/>
+        public string Name { get; set; }
+
+        /// <inheritdoc/>
         public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
         /// <summary>
@@ -19,9 +23,12 @@ namespace Agentic.Agents
         public int MaxNonToolResponses { get; set; } = 3;
 
         /// <summary>
-        /// Limit tool response to percentage of token limit
+        /// Limit tool response to percentage of token limit.
         /// </summary>
         public float LimitToolResponseSize { get; set; } = 0.6f;
+
+        /// <inheritdoc/>
+        public Toolbox Toolbox => _toolbox;
 
         private readonly IChatClient _client;
         private readonly IToolConfirmation _toolConfirmation;
@@ -53,6 +60,8 @@ namespace Agentic.Agents
         /// <inheritdoc/>
         public async Task<string> ChatAsync(string message)
         {
+            var responses = new List<string>();
+
             if (!string.IsNullOrWhiteSpace(message))
             {
                 _chatContext.AddMessage(Role.User, message);
@@ -85,7 +94,8 @@ namespace Agentic.Agents
                     _chatContext.AddMessage(Role.Assistant, response.Content);
                     OnChatResponse(new ChatResponseEventArgs
                     {
-                        Response = response.Content
+                        Response = response.Content,
+                        Agent = this
                     });
                 }
 
@@ -93,14 +103,24 @@ namespace Agentic.Agents
                 {
                     if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
-                    var toolResponse = tool.Invoke();
+                    string toolResponse;
+                    try
+                    {
+                        toolResponse = tool.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        toolResponse = $"{ex.GetType().Name}: {ex.Message}";
+                    }
+
                     toolResponse = StripAnsiColorCodes(toolResponse);
                     toolResponse = _client.LimitMessageSize(toolResponse, LimitToolResponseSize);
                     _chatContext.AddMessage(Role.User, toolResponse);
                     OnChatResponse(new ChatResponseEventArgs
                     {
                         Response = toolResponse,
-                        IsTool = true
+                        IsTool = true,
+                        Agent = this
                     });
 
                     // Reset non-tool response counter when using tools
@@ -108,6 +128,7 @@ namespace Agentic.Agents
                 }
                 else
                 {
+                    if (!string.IsNullOrWhiteSpace(response.Content)) responses.Add(response.Content);
                     nonToolResponses++;
                 }
 
@@ -115,7 +136,7 @@ namespace Agentic.Agents
                 if (previousResponse != null && response.Content == previousResponse.Content) break;
             }
 
-            return response.Content;
+            return string.Join("\n", responses);
         }
 
         /// <inheritdoc/>
@@ -137,7 +158,7 @@ namespace Agentic.Agents
             return Regex.Replace(text, ansiCodePattern, string.Empty);
         }
 
-        private void OnChatResponse(ChatResponseEventArgs eventArgs)
+        internal void OnChatResponse(ChatResponseEventArgs eventArgs)
         {
             ChatResponse?.Invoke(this, eventArgs);
         }
