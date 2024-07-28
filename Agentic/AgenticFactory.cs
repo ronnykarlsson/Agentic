@@ -6,6 +6,7 @@ using Agentic.Chat;
 using Agentic.Tools;
 using Agentic.Profiles;
 using Microsoft.Extensions.DependencyInjection;
+using Agentic.Workspaces;
 
 namespace Agentic
 {
@@ -33,12 +34,12 @@ namespace Agentic
             var agentSettings = profile.Agent;
             var defaultClientSettings = profile.Client;
 
-            var chatAgent = CreateAgent(agentSettings, defaultClientSettings);
+            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null);
 
             return chatAgent;
         }
 
-        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings)
+        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces)
         {
             var clientSettings = agentSettings.Client ?? defaultClientSettings;
 
@@ -46,6 +47,15 @@ namespace Agentic
             var chatClientFactories = CreateInstances<IChatClientFactory>();
             var chatClientFactory = chatClientFactories.FirstOrDefault(m => m.Name == clientSettings.Name);
             var chatClient = chatClientFactory.Create(clientSettings);
+
+            IWorkspace[] agentWorkspaces = Array.Empty<IWorkspace>();
+            // Create workspaces for the agent
+            if (agentSettings.Workspaces != null && agentSettings.Workspaces.Length > 0)
+            {
+                agentWorkspaces = CreateWorkspaces(agentSettings.Workspaces);
+            }
+
+            var workspaces = (inputWorkspaces ?? Array.Empty<IWorkspace>()).Concat(agentWorkspaces).ToArray();
 
             // Create toolbox for the agent
             var toolbox = Toolbox.Empty;
@@ -64,7 +74,7 @@ namespace Agentic
 
                 foreach (var partner in agentSettings.Partners)
                 {
-                    var partnerAgent = CreateAgent(partner, defaultClientSettings);
+                    var partnerAgent = CreateAgent(partner, defaultClientSettings, workspaces);
 
                     partnerAgent.ChatResponse += (sender, e) =>
                     {
@@ -102,9 +112,31 @@ namespace Agentic
                 }
             }
 
-            chatAgent.Initialize(agentSettings.Prompt, toolbox);
+            chatAgent.Initialize(agentSettings.Prompt, toolbox, workspaces);
 
             return chatAgent;
+        }
+
+        private IWorkspace[] CreateWorkspaces(WorkspaceDefinition[] workspaceDefinitions)
+        {
+            var workspaces = new List<IWorkspace>();
+
+            foreach (var workspace in workspaceDefinitions)
+            {
+                var workspaceType = CreateInstances<IWorkspace>(workspace.Type, "Workspace");
+
+                if (workspaceType.Count == 0)
+                    throw new InvalidOperationException($"Workspace {workspace.Type} not found");
+
+                if (workspaceType.Count > 1)
+                    throw new InvalidOperationException($"Multiple workspaces found with name {workspace.Type}");
+
+                var workspaceInstance = workspaceType[0];
+                workspaceInstance.Initialize(workspace.Parameters);
+                workspaces.Add(workspaceInstance);
+            }
+
+            return workspaces.ToArray();
         }
 
         private Toolbox CreateTools(ToolDefinition[] toolDefinitions)
@@ -114,7 +146,7 @@ namespace Agentic
 
             foreach (var tool in toolDefinitions)
             {
-                var agentTool = CreateInstances<ITool>(tool.Name);
+                var agentTool = CreateInstances<ITool>(tool.Name, "Tool");
 
                 if (agentTool.Count == 0)
                     throw new InvalidOperationException($"Tool {tool.Name} not found");
@@ -129,14 +161,14 @@ namespace Agentic
             return toolbox;
         }
 
-        private IReadOnlyList<T> CreateInstances<T>(string nameFilter = null)
+        private IReadOnlyList<T> CreateInstances<T>(Func<string, bool> nameFilter = null)
             where T : class
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             var instanceTypes = assemblies
                 .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => nameFilter == null || type.Name.ToLowerInvariant() == nameFilter.ToLowerInvariant())
+                .Where(type => nameFilter == null || nameFilter(type.Name))
                 .Where(type => typeof(T).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 .ToList();
 
@@ -151,6 +183,14 @@ namespace Agentic
             }
 
             return instances;
+        }
+
+        private IReadOnlyList<T> CreateInstances<T>(string nameFilter, string nameFilterSuffix)
+            where T : class
+        {
+            var filter1 = nameFilter.ToLowerInvariant();
+            var filter2 = $"{nameFilter}{nameFilterSuffix}".ToLowerInvariant();
+            return CreateInstances<T>(name => name.ToLowerInvariant() == filter1 || name.ToLowerInvariant() == filter2);
         }
     }
 }

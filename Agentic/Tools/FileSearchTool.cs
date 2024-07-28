@@ -27,7 +27,7 @@ namespace Agentic.Tools
             _datastore.IndexText(key, fileContents);
         }
 
-        public string Invoke()
+        public string Invoke(ToolExecutionContext context)
         {
             var parameter = Query.Value;
 

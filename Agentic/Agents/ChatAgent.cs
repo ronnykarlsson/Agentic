@@ -1,6 +1,7 @@
 ﻿using Agentic.Chat;
 using Agentic.Tools;
 using Agentic.Tools.Confirmation;
+using Agentic.Workspaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,7 @@ namespace Agentic.Agents
 
         private ChatContext _chatContext;
         private Toolbox _toolbox;
+        private IWorkspace[] _workspaces;
 
         public ChatAgent(IChatClient client)
         {
@@ -50,11 +52,29 @@ namespace Agentic.Agents
         }
 
         /// <inheritdoc/>
-        public void Initialize(string systemMessage, Toolbox toolbox)
+        public void Initialize(string systemMessage, Toolbox toolbox, IWorkspace[] workspaces)
         {
             _client.SetSystemMessage(systemMessage);
+
             _toolbox = toolbox;
+            if (workspaces != null)
+            {
+                foreach (var workspace in workspaces)
+                {
+                    var workspaceTools = workspace.GetWorkspaceTools();
+                    if (workspaceTools == null) continue;
+
+                    foreach (var workspaceTool in workspaceTools)
+                    {
+                        toolbox.AddTool(workspaceTool);
+                    }
+                }
+            }
+
             _client.SetTools(toolbox);
+
+            _workspaces = workspaces;
+            _client.SetWorkspaces(workspaces);
         }
 
         /// <inheritdoc/>
@@ -103,10 +123,15 @@ namespace Agentic.Agents
                 {
                     if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
+                    var toolExecutionContext = new ToolExecutionContext
+                    {
+                        Workspaces = _workspaces,
+                    };
+
                     string toolResponse;
                     try
                     {
-                        toolResponse = tool.Invoke();
+                        toolResponse = tool.Invoke(toolExecutionContext);
                     }
                     catch (Exception ex)
                     {

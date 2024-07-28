@@ -10,7 +10,7 @@ namespace Agentic.Tools.Browser
         public ToolParameter<string> Text { get; set; }
         public ToolParameter<bool> PressEnterAfterInput { get; set; }
 
-        public override string Invoke()
+        public override string Invoke(ToolExecutionContext context)
         {
             if (string.IsNullOrWhiteSpace(Id.Value))
             {

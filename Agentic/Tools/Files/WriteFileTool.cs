@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Agentic.Workspaces;
+using System.IO;
 
 namespace Agentic.Tools.Files
 {
@@ -11,15 +12,17 @@ namespace Agentic.Tools.Files
         public ToolParameter<string> Path { get; set; }
         public ToolParameter<string> Content { get; set; }
 
-        public string Invoke()
+        public string Invoke(ToolExecutionContext context)
         {
-            var directory = System.IO.Path.GetDirectoryName(Path.Value);
+            var path = context.GetWorkspace<FileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
+
+            var directory = System.IO.Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(Path.Value, Content.Value);
+            File.WriteAllText(path, Content.Value);
             return $"File written: {Path.Value}";
         }
     }

@@ -12,7 +12,7 @@ namespace Agentic.Tools.Browser
         public abstract string Description { get; }
         public virtual bool RequireConfirmation => false;
 
-        public abstract string Invoke();
+        public abstract string Invoke(ToolExecutionContext context);
 
         protected IBrowser Browser
         {

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Agentic.Workspaces;
+using System.IO;
 
 namespace Agentic.Tools.Files
 {
@@ -10,14 +11,16 @@ namespace Agentic.Tools.Files
 
         public ToolParameter<string> Path { get; set; }
 
-        public string Invoke()
+        public string Invoke(ToolExecutionContext context)
         {
-            if (!File.Exists(Path.Value))
+            var path = context.GetWorkspace<FileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
+
+            if (!File.Exists(path))
             {
                 return $"File not found: {Path.Value}";
             }
 
-            return File.ReadAllText(Path.Value);
+            return File.ReadAllText(path);
         }
     }
 }

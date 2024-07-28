@@ -1,8 +1,10 @@
 ﻿using Agentic.Exceptions;
 using Agentic.Tools;
+using Agentic.Workspaces;
 using SharpToken;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Agentic.Chat
@@ -11,12 +13,15 @@ namespace Agentic.Chat
     {
         protected string SystemMessage;
         protected Toolbox Toolbox;
+        protected IWorkspace[] Workspaces;
 
         public int MaxTokens { get; }
 
         protected abstract TRequest CreateRequest();
         protected abstract void AddRequestMessage(TRequest request, ChatMessage message);
         public abstract Task<ChatMessage> SendRequestAsync(TRequest request);
+
+        private readonly string _workspaceDelimiter = "-";
 
         protected ChatClient(int maxTokens)
         {
@@ -32,8 +37,31 @@ namespace Agentic.Chat
 
             var request = CreateRequest();
 
-            var toolsSystemMessage = Toolbox.CreateDefaultSystemMessage(SystemMessage);
-            var systemMessage = new ChatMessage(Role.System, toolsSystemMessage);
+            var systemMessageString = Toolbox.CreateDefaultSystemMessage(SystemMessage);
+
+            StringBuilder workspaceSystemMessageStringBuilder = null;
+            if (Workspaces != null && Workspaces.Length > 0)
+            {
+                workspaceSystemMessageStringBuilder = new StringBuilder();
+                foreach (var workspace in Workspaces)
+                {
+                    var workspacePrompt = workspaceSystemMessageStringBuilder.AppendLine(workspace.GetPrompt());
+                    if (string.IsNullOrWhiteSpace(workspacePrompt.ToString())) continue;
+
+                    workspaceSystemMessageStringBuilder.AppendLine(_workspaceDelimiter);
+                }
+
+                systemMessageString = $"{systemMessageString}{Environment.NewLine}{workspaceSystemMessageStringBuilder}";
+            }
+
+            if (workspaceSystemMessageStringBuilder != null)
+            {
+                var workspaceSystemMessage = workspaceSystemMessageStringBuilder.ToString();
+                var workspaceSystemMessageChatMessage = new ChatMessage(Role.System, workspaceSystemMessage);
+                AddRequestMessage(request, workspaceSystemMessageChatMessage);
+            }
+
+            var systemMessage = new ChatMessage(Role.System, systemMessageString);
             AddRequestMessage(request, systemMessage);
 
             var tokens = MaxTokens - CalculateTokens(systemMessage);
@@ -95,6 +123,11 @@ namespace Agentic.Chat
         public void SetTools(Toolbox toolbox)
         {
             Toolbox = toolbox;
+        }
+
+        public void SetWorkspaces(IWorkspace[] workspaces)
+        {
+            Workspaces = workspaces;
         }
 
         private void AddRequestMessages(ChatContext context, TRequest request, int tokens)

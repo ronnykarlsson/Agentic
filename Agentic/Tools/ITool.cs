@@ -5,6 +5,6 @@
         string Tool { get; }
         string Description { get; }
         bool RequireConfirmation { get; }
-        string Invoke();
+        string Invoke(ToolExecutionContext context);
     }
 }

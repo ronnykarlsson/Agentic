@@ -1,5 +1,6 @@
 ﻿using Agentic.Chat;
 using Agentic.Tools;
+using Agentic.Workspaces;
 using System;
 using System.Threading.Tasks;
 
@@ -27,7 +28,8 @@ namespace Agentic.Agents
         /// </summary>
         /// <param name="systemMessage">System message to set.</param>
         /// <param name="toolbox">Tools which the agent can use.</param>
-        void Initialize(string systemMessage, Toolbox toolbox);
+        /// <param name="workspaces">Workspaces with common tools and prompts.</param>
+        void Initialize(string systemMessage, Toolbox toolbox, IWorkspace[] workspaces);
 
         /// <summary>
         /// Send <paramref name="message"/> to the chat client and return the response.
