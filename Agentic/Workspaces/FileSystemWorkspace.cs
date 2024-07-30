@@ -57,7 +57,14 @@ namespace Agentic.Workspaces
 
         public string GetPath(string path)
         {
-            return Path.Combine(BasePath, path);
+            var combinedPath = Path.Combine(BasePath, path);
+
+            if (!combinedPath.StartsWith(BasePath, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new ArgumentException("Path is outside of the workspace.");
+            }
+
+            return combinedPath;
         }
 
         private int AddFileList(string path, StringBuilder stringBuilder, int level = 0)
