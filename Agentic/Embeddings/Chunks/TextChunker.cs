@@ -50,6 +50,8 @@ namespace Agentic.Embeddings.Chunks
 
                     var startIndex = largeChunk.TextStart;
 
+                    TextChunk previousChunk = null;
+
                     // Split large chunk until end is reached
                     while (startIndex <= largeChunk.TextEnd)
                     {
@@ -65,8 +67,19 @@ namespace Agentic.Embeddings.Chunks
                             TextEnd = endIndex - 1
                         };
 
-                        chunks.Insert(largeChunkIndex++, newChunk);
-                        if (endIndex - startIndex > targetChunkSize) newChunksToSplit.Add(newChunk);
+                        if (previousChunk != null && previousChunk.Chunk.Length + newChunk.Chunk.Length < targetChunkSize)
+                        {
+                            // Merge small chunks together
+                            previousChunk.Chunk += newChunk.Chunk;
+                            previousChunk.TextEnd = newChunk.TextEnd;
+                        }
+                        else
+                        {
+                            chunks.Insert(largeChunkIndex++, newChunk);
+                            if (newChunk.Chunk.Length > targetChunkSize) newChunksToSplit.Add(newChunk);
+
+                            previousChunk = newChunk;
+                        }
 
                         startIndex = endIndex;
                     }

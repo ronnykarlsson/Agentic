@@ -6,7 +6,7 @@ namespace Agentic.Tests.Embeddings.Chunks
     [TestFixture]
     public class TextChunkerTests
     {
-        private const int DefaultChunkSize = 512;
+        private const int _defaultChunkSize = 512;
 
         [Test]
         public void EmptyInput_ReturnsEmptyList()
@@ -27,16 +27,16 @@ namespace Agentic.Tests.Embeddings.Chunks
         [Test]
         public void InputExactlyAtChunkSize_ReturnsSingleChunk()
         {
-            var input = new string('a', DefaultChunkSize);
+            var input = new string('a', _defaultChunkSize);
             var result = TextChunker.ChunkText(input);
             Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].Chunk.Length, Is.EqualTo(DefaultChunkSize));
+            Assert.That(result[0].Chunk.Length, Is.EqualTo(_defaultChunkSize));
         }
 
         [Test]
         public void InputSlightlyOverChunkSize_ReturnsOneChunk()
         {
-            var input = new string('a', DefaultChunkSize) + "extra";
+            var input = new string('a', _defaultChunkSize) + "extra";
             var result = TextChunker.ChunkText(input);
             Assert.That(result.Count, Is.EqualTo(2));
         }
@@ -44,10 +44,10 @@ namespace Agentic.Tests.Embeddings.Chunks
         [Test]
         public void LongInputWithoutDelimiters_SplitsCorrectly()
         {
-            var input = new string('a', DefaultChunkSize * 3);
+            var input = new string('a', _defaultChunkSize * 3);
             var result = TextChunker.ChunkText(input);
             Assert.That(result.Count, Is.GreaterThan(1));
-            Assert.That(result.All(chunk => chunk.Chunk.Length <= DefaultChunkSize * 1.3));
+            Assert.That(result.All(chunk => chunk.Chunk.Length <= _defaultChunkSize * 1.3));
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace Agentic.Tests.Embeddings.Chunks
 
             var result = TextChunker.ChunkText(input);
             Assert.That(result.Count, Is.GreaterThan(100));
-            Assert.That(result.All(chunk => chunk.Chunk.Length <= DefaultChunkSize * 1.3));
+            Assert.That(result.All(chunk => chunk.Chunk.Length <= _defaultChunkSize * 1.3));
         }
 
         [Test]
@@ -129,11 +129,11 @@ namespace Agentic.Tests.Embeddings.Chunks
         [Test]
         public void InputWithVeryLongWord_SplitsCorrectly()
         {
-            var longWord = new string('a', DefaultChunkSize * 2);
+            var longWord = new string('a', _defaultChunkSize * 2);
             var input = $"Short text. {longWord}. More short text.";
             var result = TextChunker.ChunkText(input);
             Assert.That(result.Count, Is.GreaterThan(2));
-            Assert.That(result.All(chunk => chunk.Chunk.Length <= DefaultChunkSize * 1.3));
+            Assert.That(result.All(chunk => chunk.Chunk.Length <= _defaultChunkSize * 1.3));
         }
 
         [Test]
@@ -163,6 +163,14 @@ namespace Agentic.Tests.Embeddings.Chunks
             {
                 Assert.That(result[i + 1].TextStart, Is.GreaterThan(result[i].TextEnd));
             }
+        }
+
+        [Test]
+        public void SmallChunksAreMergedTogether()
+        {
+            var input = "This is a long input text that should be split into multiple chunks and merged together.";
+            var result = TextChunker.ChunkText(input, 50);            
+            Assert.That(result.Count, Is.EqualTo(2));
         }
     }
 }
