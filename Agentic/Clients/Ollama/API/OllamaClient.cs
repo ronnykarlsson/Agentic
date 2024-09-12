@@ -1,16 +1,15 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Agentic.Clients.OpenAI
+namespace Agentic.Clients.Ollama.API
 {
-    public class OpenAIClient : IOpenAIClient
+    public class OllamaClient : IOllamaClient
     {
         private ILogger _logger { get; set; }
 
@@ -18,46 +17,45 @@ namespace Agentic.Clients.OpenAI
         private readonly string _apiKey;
         private readonly string _baseUrl;
 
-        public OpenAIClient(IConfiguration configuration, ILoggerFactory loggerFactory)
+        public OllamaClient(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            _apiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey");
-            _baseUrl = configuration["OpenAI:BaseUrl"] ?? "https://api.openai.com/v1";
+            _apiKey = configuration["Ollama:ApiKey"] ?? "";
+            _baseUrl = configuration["Ollama:BaseUrl"] ?? "http://127.0.0.1:11434";
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            if (!string.IsNullOrEmpty(_apiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            }
 
-            _logger = loggerFactory?.CreateLogger<OpenAIClient>();
+            _logger = loggerFactory?.CreateLogger<OllamaClient>();
         }
 
-        public OpenAIClient(string apiKey, string baseUrl = "https://api.openai.com/v1")
+        public OllamaClient(string apiKey, string baseUrl = "http://127.0.0.1:11434")
         {
-            if (string.IsNullOrEmpty(apiKey)) throw new ArgumentNullException(nameof(apiKey));
             _apiKey = apiKey;
             _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            if (!string.IsNullOrEmpty(_apiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            }
         }
 
-        public async Task<OpenAIResponse> SendRequestAsync(OpenAIRequest request)
+        public async Task<OllamaResponse> SendRequestAsync(OllamaRequest request)
         {
-            var endpoint = $"{_baseUrl}/chat/completions";
+            var endpoint = $"{_baseUrl}/api/chat";
 
             try
             {
-                var payload = new
-                {
-                    model = request.Model,
-                    messages = request.Messages.Select(m => new { role = m.Role, content = m.Content })
-                };
-
-                var jsonContent = JsonSerializer.Serialize(payload);
+                var jsonContent = JsonSerializer.Serialize(request);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(endpoint, content).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<OpenAIResponse>(responseContent);
+                return JsonSerializer.Deserialize<OllamaResponse>(responseContent);
             }
             catch (HttpRequestException ex)
             {
@@ -71,25 +69,21 @@ namespace Agentic.Clients.OpenAI
             }
         }
 
-        public async Task<OpenAIEmbeddingResponse> SendEmbeddingsRequestAsync(OpenAIEmbeddingRequest request)
+        public async Task<float[]> GetEmbeddingsAsync(string input, string model)
         {
-            var endpoint = $"{_baseUrl}/embeddings";
+            var endpoint = $"{_baseUrl}/api/embeddings";
 
             try
             {
-                var payload = new
-                {
-                    model = request.Model,
-                    input = request.Input
-                };
-
-                var jsonContent = JsonSerializer.Serialize(payload);
+                var request = new OllamaEmbeddingRequest(model, input);
+                var jsonContent = JsonSerializer.Serialize(request);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(endpoint, content).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<OpenAIEmbeddingResponse>(responseContent);
+                var ollamaResponse = JsonSerializer.Deserialize<OllamaEmbeddingResponse>(responseContent);
+                return ollamaResponse.Embedding;
             }
             catch (HttpRequestException ex)
             {

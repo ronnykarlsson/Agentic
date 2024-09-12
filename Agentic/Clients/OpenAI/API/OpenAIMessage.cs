@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Agentic.Clients.OpenAI
+namespace Agentic.Clients.OpenAI.API
 {
     [DebuggerDisplay("{Role,nq} : {Content,nq}")]
     public class OpenAIMessage

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Agentic.Clients.OpenAI
+namespace Agentic.Clients.OpenAI.API
 {
     public interface IOpenAIClient
     {

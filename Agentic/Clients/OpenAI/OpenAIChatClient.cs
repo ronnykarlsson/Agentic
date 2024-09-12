@@ -1,4 +1,5 @@
-﻿using Agentic.Clients.OpenAI;
+﻿using Agentic.Chat;
+using Agentic.Clients.OpenAI.API;
 using Agentic.Exceptions;
 using Agentic.Profiles;
 using Agentic.Tools;
@@ -8,9 +9,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Agentic.Chat.OpenAI
+namespace Agentic.Clients.OpenAI
 {
-    public class OpenAIChatClient : ChatClient<OpenAIRequest>, IOpenAIChatClient
+    public class OpenAIChatClient : ChatClient<OpenAIRequest>
     {
         private readonly IOpenAIClient _client;
         private readonly string _model;

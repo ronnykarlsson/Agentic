@@ -16,12 +16,12 @@ namespace Agentic.Agents
 
         public IChatAgent Create()
         {
-            return new ChatAgent(_clientFactory.Create(), _toolConfirmation);
+            return new ChatAgent(_clientFactory.CreateChatClient(), _toolConfirmation);
         }
 
         public IChatAgent Create(IToolConfirmation toolConfirmation)
         {
-            return new ChatAgent(_clientFactory.Create(), toolConfirmation);
+            return new ChatAgent(_clientFactory.CreateChatClient(), toolConfirmation);
         }
 
         public ChainedChatAgent CreateChainedChatAgent(params IChatAgent[] chatAgents)

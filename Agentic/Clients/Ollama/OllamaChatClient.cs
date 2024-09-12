@@ -1,4 +1,5 @@
-﻿using Agentic.Clients.Ollama;
+﻿using Agentic.Chat;
+using Agentic.Clients.Ollama.API;
 using Agentic.Exceptions;
 using Agentic.Profiles;
 using Agentic.Tools;
@@ -7,9 +8,9 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Agentic.Chat.Ollama
+namespace Agentic.Clients.Ollama
 {
-    public class OllamaChatClient : ChatClient<OllamaRequest>, IOllamaChatClient
+    public class OllamaChatClient : ChatClient<OllamaRequest>
     {
         private readonly IOllamaClient _client;
         private readonly string _model;

@@ -4,6 +4,6 @@ namespace Agentic.Embeddings
 {
     public interface IEmbeddingsClient
     {
-        Task<float[]> SendAsync(string input);
+        Task<float[]> GetEmbeddingsAsync(string input);
     }
 }

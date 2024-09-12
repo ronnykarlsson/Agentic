@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Agentic.Clients.Ollama
+namespace Agentic.Clients.Ollama.API
 {
     public partial class OllamaRequest
     {

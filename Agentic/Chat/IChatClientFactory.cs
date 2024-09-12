@@ -5,7 +5,7 @@ namespace Agentic.Chat
     public interface IChatClientFactory
     {
         string Name { get; }
-        IChatClient Create();
-        IChatClient Create(ClientSettings clientSettings);
+        IChatClient CreateChatClient();
+        IChatClient CreateChatClient(ClientSettings clientSettings);
     }
 }

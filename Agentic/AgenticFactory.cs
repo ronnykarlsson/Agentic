@@ -7,6 +7,7 @@ using Agentic.Tools;
 using Agentic.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using Agentic.Workspaces;
+using Agentic.Embeddings;
 
 namespace Agentic
 {
@@ -34,19 +35,29 @@ namespace Agentic
             var agentSettings = profile.Agent;
             var defaultClientSettings = profile.Client;
 
-            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null);
+            IEmbeddingsClient embeddingsClient = null;
+
+            var embeddingsClientSettings = profile.EmbeddingsClient;
+            if (embeddingsClientSettings != null)
+            {
+                var embeddingsClientFactories = CreateInstances<IEmbeddingsClientFactory>();
+                var embeddingsClientFactory = embeddingsClientFactories.FirstOrDefault(m => m.Name == embeddingsClientSettings.Name);
+                embeddingsClient = embeddingsClientFactory.CreateEmbeddingsClient(embeddingsClientSettings);
+            }
+
+            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null, embeddingsClient);
 
             return chatAgent;
         }
 
-        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces)
+        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces, IEmbeddingsClient embeddingsClient)
         {
             var clientSettings = agentSettings.Client ?? defaultClientSettings;
 
             // Create client to use for the agent
             var chatClientFactories = CreateInstances<IChatClientFactory>();
             var chatClientFactory = chatClientFactories.FirstOrDefault(m => m.Name == clientSettings.Name);
-            var chatClient = chatClientFactory.Create(clientSettings);
+            var chatClient = chatClientFactory.CreateChatClient(clientSettings);
 
             IWorkspace[] agentWorkspaces = Array.Empty<IWorkspace>();
             // Create workspaces for the agent
@@ -74,7 +85,7 @@ namespace Agentic
 
                 foreach (var partner in agentSettings.Partners)
                 {
-                    var partnerAgent = CreateAgent(partner, defaultClientSettings, workspaces);
+                    var partnerAgent = CreateAgent(partner, defaultClientSettings, workspaces, embeddingsClient);
 
                     partnerAgent.ChatResponse += (sender, e) =>
                     {

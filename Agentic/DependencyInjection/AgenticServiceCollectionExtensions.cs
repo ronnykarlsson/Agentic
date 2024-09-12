@@ -1,11 +1,10 @@
 ﻿using Agentic.Agents;
 using Agentic.Chat;
-using Agentic.Chat.Ollama;
-using Agentic.Chat.OpenAI;
 using Agentic.Clients.Ollama;
+using Agentic.Clients.Ollama.API;
 using Agentic.Clients.OpenAI;
+using Agentic.Clients.OpenAI.API;
 using Agentic.Embeddings;
-using Agentic.Embeddings.OpenAI;
 using Agentic.Profiles;
 using Agentic.Tools.Confirmation;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,18 +20,17 @@ namespace Agentic.DependencyInjection
 
                 // Open AI
                 .AddTransient<IOpenAIClient, OpenAIClient>()
-                .AddTransient<IOpenAIChatClient, OpenAIChatClient>()
-                .AddTransient<IOpenAIChatClientFactory, OpenAIChatClientFactory>()
-                .AddTransient<IOpenAIEmbeddingsClient, OpenAIEmbeddingsClient>()
+                .AddTransient<IChatClient, OpenAIChatClient>()
+                .AddTransient<IEmbeddingsClient, OpenAIEmbeddingsClient>()
+                .AddTransient<IChatClientFactory, OpenAIClientFactory>()
+                .AddTransient<IEmbeddingsClientFactory, OpenAIClientFactory>()
 
                 // Ollama
                 .AddTransient<IOllamaClient, OllamaClient>()
-                .AddTransient<IOllamaChatClient, OllamaChatClient>()
-                .AddTransient<IOllamaChatClientFactory, OllamaChatClientFactory>()
-
-                // Default Open AI
-                .AddTransient<IChatClientFactory, OpenAIChatClientFactory>()
-                .AddTransient<IEmbeddingsClient, OpenAIEmbeddingsClient>()
+                .AddTransient<IChatClient, OllamaChatClient>()
+                .AddTransient<IEmbeddingsClient, OllamaEmbeddingsClient>()
+                .AddTransient<IChatClientFactory, OllamaClientFactory>()
+                .AddTransient<IEmbeddingsClientFactory, OllamaClientFactory>()
 
                 .AddTransient<IChatAgent, ChatAgent>()
                 .AddTransient<IChatAgentFactory, ChatAgentFactory>()

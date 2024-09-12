@@ -1,4 +1,4 @@
-﻿namespace Agentic.Clients.OpenAI
+﻿namespace Agentic.Clients.OpenAI.API
 {
     public class OpenAIEmbeddingRequest
     {

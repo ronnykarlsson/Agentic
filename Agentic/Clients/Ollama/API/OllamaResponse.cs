@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Agentic.Clients.Ollama
+namespace Agentic.Clients.Ollama.API
 {
     public class OllamaResponse
     {
