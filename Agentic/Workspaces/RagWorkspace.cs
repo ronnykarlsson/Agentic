@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Agentic.Chat;
 using Agentic.Embeddings.Content;
+using Agentic.Helpers;
 
 namespace Agentic.Workspaces
 {
@@ -33,11 +34,11 @@ namespace Agentic.Workspaces
 
             if (parameters.TryGetValue("file", out var fileValue))
             {
-                _contentProcessor.ProcessFiles(new[] { fileValue });
+                _contentProcessor.ProcessFiles(new[] { FileHelpers.ResolvePath(fileValue) });
             }
             else if (parameters.TryGetValue("folder", out var folderValue))
             {
-                _contentProcessor.ProcessFolders(new[] { folderValue });
+                _contentProcessor.ProcessFolders(new[] { FileHelpers.ResolvePath(folderValue) });
             }
             else
             {

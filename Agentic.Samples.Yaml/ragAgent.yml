@@ -1,0 +1,19 @@
+client:
+  name: Ollama
+  model: mistral-nemo
+  tokens: 8000
+
+embeddingClient:
+  name: Ollama
+  model: nomic-embed-text
+
+agent:
+  name: Assistant
+  workspaces:
+    - type: filesystem
+      parameters:
+        path: ./filesystem/
+    - type: rag
+      parameters:
+        folder: ./rag/
+  prompt: You are a helpful assistant, you answer questions as accurately as you can and provide guidance to the best of your ability.

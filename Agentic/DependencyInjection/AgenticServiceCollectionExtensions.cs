@@ -26,6 +26,7 @@ namespace Agentic.DependencyInjection
                 .AddTransient<IEmbeddingClient, OpenAIEmbeddingClient>()
                 .AddTransient<IChatClientFactory, OpenAIClientFactory>()
                 .AddTransient<IEmbeddingClientFactory, OpenAIClientFactory>()
+                .AddTransient<OpenAIClientFactory, OpenAIClientFactory>()
 
                 // Ollama
                 .AddTransient<IOllamaClient, OllamaClient>()
@@ -33,10 +34,10 @@ namespace Agentic.DependencyInjection
                 .AddTransient<IEmbeddingClient, OllamaEmbeddingClient>()
                 .AddTransient<IChatClientFactory, OllamaClientFactory>()
                 .AddTransient<IEmbeddingClientFactory, OllamaClientFactory>()
+                .AddTransient<OllamaClientFactory, OllamaClientFactory>()
 
                 // Other
                 .AddTransient<IChatAgent, ChatAgent>()
-                .AddTransient<IChatAgentFactory, ChatAgentFactory>()
                 .AddTransient<IContentProcessor, ContentProcessor>()
                 .AddTransient<IRetrievalService, RetrievalService>()
                 .AddTransient<IEmbeddingContext, EmbeddingContext>()
