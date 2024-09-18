@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Agentic.Clients.OpenAI
 {
-    public class OpenAIClientFactory : IChatClientFactory, IEmbeddingsClientFactory
+    public class OpenAIClientFactory : IChatClientFactory, IEmbeddingClientFactory
     {
         private readonly IOpenAIClient _client;
         private readonly IConfiguration _configuration;
@@ -29,12 +29,12 @@ namespace Agentic.Clients.OpenAI
             return new OpenAIChatClient(_configuration, clientSettings);
         }
 
-        public IEmbeddingsClient CreateEmbeddingsClient()
+        public IEmbeddingClient CreateEmbeddingClient()
         {
             return new OpenAIEmbeddingsClient(_client, _configuration);
         }
 
-        public IEmbeddingsClient CreateEmbeddingsClient(ClientSettings clientSettings)
+        public IEmbeddingClient CreateEmbeddingClient(ClientSettings clientSettings)
         {
             return new OpenAIEmbeddingsClient(clientSettings);
         }

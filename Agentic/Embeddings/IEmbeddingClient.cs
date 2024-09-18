@@ -2,7 +2,7 @@
 
 namespace Agentic.Embeddings
 {
-    public interface IEmbeddingsClient
+    public interface IEmbeddingClient
     {
         Task<float[]> GetEmbeddingsAsync(string input);
     }

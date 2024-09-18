@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Agentic.Clients.Ollama
 {
-    public class OllamaClientFactory : IChatClientFactory, IEmbeddingsClientFactory
+    public class OllamaClientFactory : IChatClientFactory, IEmbeddingClientFactory
     {
         private readonly IOllamaClient _client;
         private readonly IConfiguration _configuration;
@@ -29,12 +29,12 @@ namespace Agentic.Clients.Ollama
             return new OllamaChatClient(clientSettings);
         }
 
-        public IEmbeddingsClient CreateEmbeddingsClient()
+        public IEmbeddingClient CreateEmbeddingClient()
         {
             return new OllamaEmbeddingsClient(_client, _configuration);
         }
 
-        public IEmbeddingsClient CreateEmbeddingsClient(ClientSettings clientSettings)
+        public IEmbeddingClient CreateEmbeddingClient(ClientSettings clientSettings)
         {
             return new OllamaEmbeddingsClient(clientSettings);
         }

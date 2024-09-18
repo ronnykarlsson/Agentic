@@ -35,22 +35,22 @@ namespace Agentic
             var agentSettings = profile.Agent;
             var defaultClientSettings = profile.Client;
 
-            IEmbeddingsClient embeddingsClient = null;
+            IEmbeddingClient embeddingClient = null;
 
             var embeddingsClientSettings = profile.EmbeddingsClient;
             if (embeddingsClientSettings != null)
             {
-                var embeddingsClientFactories = CreateInstances<IEmbeddingsClientFactory>();
-                var embeddingsClientFactory = embeddingsClientFactories.FirstOrDefault(m => m.Name == embeddingsClientSettings.Name);
-                embeddingsClient = embeddingsClientFactory.CreateEmbeddingsClient(embeddingsClientSettings);
+                var embeddingClientFactories = CreateInstances<IEmbeddingClientFactory>();
+                var embeddingClientFactory = embeddingClientFactories.FirstOrDefault(m => m.Name == embeddingsClientSettings.Name);
+                embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingsClientSettings);
             }
 
-            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null, embeddingsClient);
+            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null, embeddingClient);
 
             return chatAgent;
         }
 
-        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces, IEmbeddingsClient embeddingsClient)
+        private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces, IEmbeddingClient embeddingsClient)
         {
             var clientSettings = agentSettings.Client ?? defaultClientSettings;
 

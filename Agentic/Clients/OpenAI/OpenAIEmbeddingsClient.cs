@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Agentic.Clients.OpenAI
 {
-    public class OpenAIEmbeddingsClient : IEmbeddingsClient
+    public class OpenAIEmbeddingsClient : IEmbeddingClient
     {
         private readonly IOpenAIClient _client;
         private readonly string _model;

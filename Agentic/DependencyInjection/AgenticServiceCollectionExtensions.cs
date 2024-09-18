@@ -21,16 +21,16 @@ namespace Agentic.DependencyInjection
                 // Open AI
                 .AddTransient<IOpenAIClient, OpenAIClient>()
                 .AddTransient<IChatClient, OpenAIChatClient>()
-                .AddTransient<IEmbeddingsClient, OpenAIEmbeddingsClient>()
+                .AddTransient<IEmbeddingClient, OpenAIEmbeddingsClient>()
                 .AddTransient<IChatClientFactory, OpenAIClientFactory>()
-                .AddTransient<IEmbeddingsClientFactory, OpenAIClientFactory>()
+                .AddTransient<IEmbeddingClientFactory, OpenAIClientFactory>()
 
                 // Ollama
                 .AddTransient<IOllamaClient, OllamaClient>()
                 .AddTransient<IChatClient, OllamaChatClient>()
-                .AddTransient<IEmbeddingsClient, OllamaEmbeddingsClient>()
+                .AddTransient<IEmbeddingClient, OllamaEmbeddingsClient>()
                 .AddTransient<IChatClientFactory, OllamaClientFactory>()
-                .AddTransient<IEmbeddingsClientFactory, OllamaClientFactory>()
+                .AddTransient<IEmbeddingClientFactory, OllamaClientFactory>()
 
                 .AddTransient<IChatAgent, ChatAgent>()
                 .AddTransient<IChatAgentFactory, ChatAgentFactory>()

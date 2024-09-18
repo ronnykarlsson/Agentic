@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Agentic.Clients.Ollama
 {
-    public class OllamaEmbeddingsClient : IEmbeddingsClient
+    public class OllamaEmbeddingsClient : IEmbeddingClient
     {
         private readonly IOllamaClient _client;
         private readonly string _model;
