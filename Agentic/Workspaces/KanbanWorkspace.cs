@@ -1,4 +1,5 @@
-﻿using Agentic.Tools;
+﻿using Agentic.Chat;
+using Agentic.Tools;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Agentic.Workspaces
 
         public List<KanbanWorkItem> WorkItems { get; } = new List<KanbanWorkItem>();
 
-        public string GetPrompt()
+        public string GetPrompt(ChatContext chatContext)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(Name);

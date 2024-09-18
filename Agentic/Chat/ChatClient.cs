@@ -45,7 +45,7 @@ namespace Agentic.Chat
                 workspaceSystemMessageStringBuilder = new StringBuilder();
                 foreach (var workspace in Workspaces)
                 {
-                    var workspacePrompt = workspaceSystemMessageStringBuilder.AppendLine(workspace.GetPrompt());
+                    var workspacePrompt = workspaceSystemMessageStringBuilder.AppendLine(workspace.GetPrompt(context));
                     if (string.IsNullOrWhiteSpace(workspacePrompt.ToString())) continue;
 
                     workspaceSystemMessageStringBuilder.AppendLine(_workspaceDelimiter);

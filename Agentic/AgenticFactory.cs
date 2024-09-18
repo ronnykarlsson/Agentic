@@ -8,6 +8,8 @@ using Agentic.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using Agentic.Workspaces;
 using Agentic.Embeddings;
+using Agentic.Embeddings.Context;
+using Agentic.Embeddings.Store;
 
 namespace Agentic
 {
@@ -37,12 +39,17 @@ namespace Agentic
 
             IEmbeddingClient embeddingClient = null;
 
-            var embeddingsClientSettings = profile.EmbeddingsClient;
-            if (embeddingsClientSettings != null)
+            var embeddingContext = new EmbeddingContext();
+
+            var embeddingClientSettings = profile.EmbeddingClient;
+            if (embeddingClientSettings != null)
             {
                 var embeddingClientFactories = CreateInstances<IEmbeddingClientFactory>();
-                var embeddingClientFactory = embeddingClientFactories.FirstOrDefault(m => m.Name == embeddingsClientSettings.Name);
-                embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingsClientSettings);
+                var embeddingClientFactory = embeddingClientFactories.FirstOrDefault(m => m.Name == embeddingClientSettings.Name);
+                embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingClientSettings);
+
+                embeddingContext.Client = embeddingClient;
+                embeddingContext.Store = new EmbeddingStore();
             }
 
             var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null, embeddingClient);

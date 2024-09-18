@@ -31,12 +31,12 @@ namespace Agentic.Clients.OpenAI
 
         public IEmbeddingClient CreateEmbeddingClient()
         {
-            return new OpenAIEmbeddingsClient(_client, _configuration);
+            return new OpenAIEmbeddingClient(_client, _configuration);
         }
 
         public IEmbeddingClient CreateEmbeddingClient(ClientSettings clientSettings)
         {
-            return new OpenAIEmbeddingsClient(clientSettings);
+            return new OpenAIEmbeddingClient(clientSettings);
         }
     }
 }

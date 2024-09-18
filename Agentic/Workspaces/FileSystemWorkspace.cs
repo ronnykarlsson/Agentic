@@ -1,4 +1,5 @@
-﻿using Agentic.Tools;
+﻿using Agentic.Chat;
+using Agentic.Tools;
 using Agentic.Tools.Files;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Agentic.Workspaces
     {
         public string BasePath { get; set; }
 
-        public string GetPrompt()
+        public string GetPrompt(ChatContext chatContext)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Working directory: {BasePath}");

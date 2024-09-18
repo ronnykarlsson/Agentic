@@ -31,12 +31,12 @@ namespace Agentic.Clients.Ollama
 
         public IEmbeddingClient CreateEmbeddingClient()
         {
-            return new OllamaEmbeddingsClient(_client, _configuration);
+            return new OllamaEmbeddingClient(_client, _configuration);
         }
 
         public IEmbeddingClient CreateEmbeddingClient(ClientSettings clientSettings)
         {
-            return new OllamaEmbeddingsClient(clientSettings);
+            return new OllamaEmbeddingClient(clientSettings);
         }
     }
 }

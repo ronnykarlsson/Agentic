@@ -32,6 +32,9 @@ namespace Agentic.Chat
         private ChatMessageNode _head;
         private ChatMessageNode _tail;
 
+        public ChatMessageNode Head => _head;
+        public ChatMessageNode Tail => _tail;
+
         public int Count { get; set; }
 
         public ChatMessageLinkedList()

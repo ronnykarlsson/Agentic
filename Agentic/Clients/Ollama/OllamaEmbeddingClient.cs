@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Agentic.Clients.Ollama
 {
-    public class OllamaEmbeddingsClient : IEmbeddingClient
+    public class OllamaEmbeddingClient : IEmbeddingClient
     {
         private readonly IOllamaClient _client;
         private readonly string _model;
 
-        public OllamaEmbeddingsClient(IOllamaClient client, IConfiguration configuration)
+        public OllamaEmbeddingClient(IOllamaClient client, IConfiguration configuration)
         {
             if (client == null) throw new ArgumentNullException(nameof(client));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -21,7 +21,7 @@ namespace Agentic.Clients.Ollama
             _model = configuration["Ollama:EmbeddingsModel"] ?? "nomic-embed-text";
         }
 
-        public OllamaEmbeddingsClient(ClientSettings clientSettings)
+        public OllamaEmbeddingClient(ClientSettings clientSettings)
         {
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
 

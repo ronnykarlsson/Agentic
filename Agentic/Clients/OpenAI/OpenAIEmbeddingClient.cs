@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Agentic.Clients.OpenAI
 {
-    public class OpenAIEmbeddingsClient : IEmbeddingClient
+    public class OpenAIEmbeddingClient : IEmbeddingClient
     {
         private readonly IOpenAIClient _client;
         private readonly string _model;
 
-        public OpenAIEmbeddingsClient(IOpenAIClient client, IConfiguration configuration)
+        public OpenAIEmbeddingClient(IOpenAIClient client, IConfiguration configuration)
         {
             if (client == null) throw new ArgumentNullException(nameof(client));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -22,7 +22,7 @@ namespace Agentic.Clients.OpenAI
             _model = configuration["OpenAI:EmbeddingsModel"] ?? "nomic-embed-text";
         }
 
-        public OpenAIEmbeddingsClient(ClientSettings clientSettings)
+        public OpenAIEmbeddingClient(ClientSettings clientSettings)
         {
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
 
