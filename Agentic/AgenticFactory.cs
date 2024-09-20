@@ -11,6 +11,7 @@ using Agentic.Embeddings;
 using Agentic.Embeddings.Cache;
 using Agentic.Embeddings.Context;
 using Agentic.Embeddings.Store;
+using System.IO;
 
 namespace Agentic
 {
@@ -18,6 +19,8 @@ namespace Agentic
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IProfileLoader _profileLoader;
+
+        private string _profilePath;
 
         public AgenticFactory(IServiceProvider serviceProvider, IProfileLoader profileLoader)
         {
@@ -38,8 +41,6 @@ namespace Agentic
             var agentSettings = profile.Agent;
             var defaultClientSettings = profile.Client;
 
-            IEmbeddingClient embeddingClient = null;
-
             var embeddingContext = new EmbeddingContext();
 
             var embeddingClientSettings = profile.EmbeddingClient;
@@ -49,9 +50,16 @@ namespace Agentic
                 var embeddingClientFactory = embeddingClientFactories.FirstOrDefault(m => m.Name == embeddingClientSettings.Name);
                 if (embeddingClientFactory == null) throw new InvalidOperationException($"Embedding client {embeddingClientSettings.Name} not found");
 
-                embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingClientSettings);
+                var embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingClientSettings);
 
-                embeddingContext.Service = new EmbeddingService(embeddingClient, new FileEmbeddingCache(".agentic/embeddings", embeddingClientSettings.Name));
+                var cacheFolder = ".agentic/embeddings";
+                if (!string.IsNullOrEmpty(_profilePath))
+                {
+                    var profileDirectory = Path.GetDirectoryName(_profilePath);
+                    if (profileDirectory != null) cacheFolder = Path.Combine(profileDirectory, cacheFolder);
+                }
+
+                embeddingContext.Service = new EmbeddingService(embeddingClient, new FileEmbeddingCache(cacheFolder, $"{embeddingClientSettings.Name.ToLowerInvariant()}-{embeddingClientSettings.Model.ToLowerInvariant()}"));
                 embeddingContext.Store = new EmbeddingStore();
             }
 
