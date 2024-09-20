@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Agentic.Agents;
+using System;
 
 namespace Agentic.Tools
 {
@@ -23,7 +24,7 @@ namespace Agentic.Tools
         public string Description { get; }
         public bool RequireConfirmation { get; } = true;
 
-        public virtual string Invoke(ToolExecutionContext context)
+        public virtual string Invoke(ExecutionContext context)
         {
             return _action();
         }
@@ -41,7 +42,7 @@ namespace Agentic.Tools
 
         public ToolParameter<T> Parameter { get; set; }
 
-        public override string Invoke(ToolExecutionContext context)
+        public override string Invoke(ExecutionContext context)
         {
             return _action(Parameter.Value);
         }
@@ -61,7 +62,7 @@ namespace Agentic.Tools
 
         public ToolParameter<T2> Parameter2 { get; set; }
 
-        public override string Invoke(ToolExecutionContext context)
+        public override string Invoke(ExecutionContext context)
         {
             return _action(Parameter1.Value, Parameter2.Value);
         }
@@ -83,7 +84,7 @@ namespace Agentic.Tools
 
         public ToolParameter<T3> Parameter3 { get; set; }
 
-        public override string Invoke(ToolExecutionContext context)
+        public override string Invoke(ExecutionContext context)
         {
             return _action(Parameter1.Value, Parameter2.Value, Parameter3.Value);
         }
@@ -107,7 +108,7 @@ namespace Agentic.Tools
 
         public ToolParameter<T4> Parameter4 { get; set; }
 
-        public override string Invoke(ToolExecutionContext context)
+        public override string Invoke(ExecutionContext context)
         {
             return _action(Parameter1.Value, Parameter2.Value, Parameter3.Value, Parameter4.Value);
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using Agentic.Agents;
+using Microsoft.Playwright;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +13,7 @@ namespace Agentic.Tools.Browser
         public abstract string Description { get; }
         public virtual bool RequireConfirmation => false;
 
-        public abstract string Invoke(ToolExecutionContext context);
+        public abstract string Invoke(ExecutionContext context);
 
         protected IBrowser Browser
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Agentic.Agents;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -11,7 +12,7 @@ namespace Agentic.Tools
         public bool RequireConfirmation { get; } = true;
         public ToolParameter<string> Script { get; set; }
 
-        public string Invoke(ToolExecutionContext context)
+        public string Invoke(ExecutionContext context)
         {
             var script = Script.Value;
 

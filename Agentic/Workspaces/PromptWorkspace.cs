@@ -1,4 +1,5 @@
-﻿using Agentic.Chat;
+﻿using Agentic.Agents;
+using Agentic.Chat;
 using Agentic.Tools;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace Agentic.Workspaces
             Prompt = prompt;
         }
 
-        public string GetPrompt(ChatContext chatContext)
+        public string GetPrompt(ExecutionContext context)
         {
             return Prompt;
         }

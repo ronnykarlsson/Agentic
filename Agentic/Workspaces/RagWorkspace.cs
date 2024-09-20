@@ -1,4 +1,5 @@
-﻿using Agentic.Tools;
+﻿using Agentic.Agents;
+using Agentic.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,12 +47,12 @@ namespace Agentic.Workspaces
             }
         }
 
-        public string GetPrompt(ChatContext chatContext)
+        public string GetPrompt(ExecutionContext context)
         {
-            if (chatContext?.Messages == null)
-                throw new ArgumentNullException(nameof(chatContext), "ChatContext or Messages cannot be null.");
+            if (context?.Messages == null)
+                throw new ArgumentNullException(nameof(context), "ChatContext or Messages cannot be null.");
 
-            var lastMessages = GetLastNMessages(chatContext.Messages.Tail, _numberOfChatMessages);
+            var lastMessages = GetLastNMessages(context.Messages.Tail, _numberOfChatMessages);
 
             if (lastMessages.Count == 0) return null;
 

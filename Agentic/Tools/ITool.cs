@@ -1,10 +1,12 @@
-﻿namespace Agentic.Tools
+﻿using Agentic.Agents;
+
+namespace Agentic.Tools
 {
     public interface ITool
     {
         string Tool { get; }
         string Description { get; }
         bool RequireConfirmation { get; }
-        string Invoke(ToolExecutionContext context);
+        string Invoke(ExecutionContext context);
     }
 }

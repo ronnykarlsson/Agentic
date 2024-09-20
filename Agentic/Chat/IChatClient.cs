@@ -9,8 +9,8 @@ namespace Agentic.Chat
         void SetSystemMessage(string systemMessage);
         void SetTools(Toolbox toolbox);
         void SetWorkspaces(IWorkspace[] workspaces);
-        Task<ChatMessage> SendAsync(ChatContext context);
-        Task<ChatMessage> SendAsync(ChatContext context, ChatMessage message);
+        Task<ChatMessage> SendAsync(ChatContext chatContext);
+        Task<ChatMessage> SendAsync(ChatContext chatContext, ChatMessage message);
         string LimitMessageSize(string message, float percentMaxTokens);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Agentic.Workspaces;
+﻿using Agentic.Agents;
+using Agentic.Workspaces;
 using System.IO;
 
 namespace Agentic.Tools.Files
@@ -11,7 +12,7 @@ namespace Agentic.Tools.Files
 
         public ToolParameter<string> Path { get; set; }
 
-        public string Invoke(ToolExecutionContext context)
+        public string Invoke(ExecutionContext context)
         {
             var path = context.GetWorkspace<FileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
 

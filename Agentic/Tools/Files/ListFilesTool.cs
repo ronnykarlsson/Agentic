@@ -1,4 +1,5 @@
-﻿using Agentic.Workspaces;
+﻿using Agentic.Agents;
+using Agentic.Workspaces;
 using System;
 using System.IO;
 
@@ -13,7 +14,7 @@ namespace Agentic.Tools.Files
         public ToolParameter<string> Path { get; set; }
         public bool Recursive { get; set; }
 
-        public string Invoke(ToolExecutionContext context)
+        public string Invoke(ExecutionContext context)
         {
             if (!Directory.Exists(Path.Value))
             {

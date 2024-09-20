@@ -1,10 +1,12 @@
-﻿using Agentic.Workspaces;
+﻿using Agentic.Chat;
+using Agentic.Workspaces;
 using System.Linq;
 
-namespace Agentic.Tools
+namespace Agentic.Agents
 {
-    public class ToolExecutionContext
+    public class ExecutionContext
     {
+        public ChatMessageLinkedList Messages { get; set; }
         public IWorkspace[] Workspaces { get; set; }
 
         public T GetWorkspace<T>() where T : IWorkspace

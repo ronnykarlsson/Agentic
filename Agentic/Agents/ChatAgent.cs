@@ -122,16 +122,17 @@ namespace Agentic.Agents
                 if (tool != null)
                 {
                     if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
-
-                    var toolExecutionContext = new ToolExecutionContext
+                    
+                    var executionContext = new ExecutionContext
                     {
-                        Workspaces = _workspaces,
+                        Messages = _chatContext.Messages,
+                        Workspaces = _workspaces
                     };
 
                     string toolResponse;
                     try
                     {
-                        toolResponse = tool.Invoke(toolExecutionContext);
+                        toolResponse = tool.Invoke(executionContext);
                     }
                     catch (Exception ex)
                     {

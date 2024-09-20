@@ -24,7 +24,7 @@ namespace Agentic.Tools
         public ToolParameter<string> Target { get; set; }
         public ToolParameter<string> Message { get; set; }
 
-        public string Invoke(ToolExecutionContext context)
+        public string Invoke(ExecutionContext context)
         {
             if (string.IsNullOrEmpty(Target.Value)) return $"{nameof(Target)} is required";
             if (string.IsNullOrEmpty(Message.Value)) return $"{nameof(Message)} is required";

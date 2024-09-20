@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using Agentic.Agents;
+using Microsoft.Playwright;
 
 namespace Agentic.Tools.Browser
 {
@@ -10,7 +11,7 @@ namespace Agentic.Tools.Browser
         public ToolParameter<string> Text { get; set; }
         public ToolParameter<bool> PressEnterAfterInput { get; set; }
 
-        public override string Invoke(ToolExecutionContext context)
+        public override string Invoke(ExecutionContext context)
         {
             if (string.IsNullOrWhiteSpace(Id.Value))
             {

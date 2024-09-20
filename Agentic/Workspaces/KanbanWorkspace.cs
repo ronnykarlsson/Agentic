@@ -1,4 +1,5 @@
-﻿using Agentic.Chat;
+﻿using Agentic.Agents;
+using Agentic.Chat;
 using Agentic.Tools;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Agentic.Workspaces
 
         public List<KanbanWorkItem> WorkItems { get; } = new List<KanbanWorkItem>();
 
-        public string GetPrompt(ChatContext chatContext)
+        public string GetPrompt(ExecutionContext context)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(Name);
@@ -70,7 +71,7 @@ namespace Agentic.Workspaces
             public ToolParameter<string> TicketName { get; set; }
             public ToolParameter<string> TicketDescription { get; set; }
 
-            public string Invoke(ToolExecutionContext context)
+            public string Invoke(ExecutionContext context)
             {
                 var workspace = _kanbanWorkspace ?? context.GetWorkspace<KanbanWorkspace>();
                 if (workspace == null) return "No Kanban workspace found";
@@ -104,7 +105,7 @@ namespace Agentic.Workspaces
 
             public ToolParameter<string> TicketName { get; set; }
 
-            public string Invoke(ToolExecutionContext context)
+            public string Invoke(ExecutionContext context)
             {
                 var workspace = _kanbanWorkspace ?? context.GetWorkspace<KanbanWorkspace>();
                 if (workspace == null) return "No Kanban workspace found";

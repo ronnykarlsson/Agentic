@@ -1,4 +1,5 @@
-﻿using Agentic.Exceptions;
+﻿using Agentic.Agents;
+using Agentic.Exceptions;
 using Agentic.Tools;
 using Agentic.Workspaces;
 using SharpToken;
@@ -28,7 +29,7 @@ namespace Agentic.Chat
             MaxTokens = maxTokens;
         }
 
-        public virtual async Task<ChatMessage> SendAsync(ChatContext context)
+        public virtual async Task<ChatMessage> SendAsync(ChatContext chatContext)
         {
             if (string.IsNullOrWhiteSpace(SystemMessage))
             {
@@ -42,12 +43,19 @@ namespace Agentic.Chat
             StringBuilder workspaceSystemMessageStringBuilder = null;
             if (Workspaces != null && Workspaces.Length > 0)
             {
+                var executionContext = new ExecutionContext
+                {
+                    Messages = chatContext.Messages,
+                    Workspaces = Workspaces
+                };
+
                 workspaceSystemMessageStringBuilder = new StringBuilder();
                 foreach (var workspace in Workspaces)
                 {
-                    var workspacePrompt = workspaceSystemMessageStringBuilder.AppendLine(workspace.GetPrompt(context));
-                    if (string.IsNullOrWhiteSpace(workspacePrompt.ToString())) continue;
+                    var workspacePrompt = workspace.GetPrompt(executionContext);
+                    if (string.IsNullOrWhiteSpace(workspacePrompt)) continue;
 
+                    workspaceSystemMessageStringBuilder.AppendLine(workspacePrompt);
                     workspaceSystemMessageStringBuilder.AppendLine(_workspaceDelimiter);
                 }
 
@@ -65,14 +73,14 @@ namespace Agentic.Chat
             AddRequestMessage(request, systemMessage);
 
             var tokens = MaxTokens - CalculateTokens(systemMessage);
-            AddRequestMessages(context, request, tokens);
+            AddRequestMessages(chatContext, request, tokens);
 
             var chatMessage = await SendRequestAsync(request).ConfigureAwait(false);
 
             return chatMessage;
         }
 
-        public virtual async Task<ChatMessage> SendAsync(ChatContext context, ChatMessage message)
+        public virtual async Task<ChatMessage> SendAsync(ChatContext chatContext, ChatMessage message)
         {
             if (string.IsNullOrWhiteSpace(SystemMessage))
             {
@@ -92,7 +100,7 @@ namespace Agentic.Chat
             var request = CreateRequest();
 
             AddRequestMessage(request, systemMessage);
-            AddRequestMessages(context, request, tokens);
+            AddRequestMessages(chatContext, request, tokens);
             AddRequestMessage(request, message);
 
             var chatMessage = await SendRequestAsync(request).ConfigureAwait(false);

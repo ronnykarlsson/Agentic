@@ -1,4 +1,5 @@
-﻿using Agentic.Chat;
+﻿using Agentic.Agents;
+using Agentic.Chat;
 using Agentic.Tools;
 using System.Collections.Generic;
 
@@ -10,7 +11,7 @@ namespace Agentic.Workspaces
     public interface IWorkspace
     {
         void Initialize(Dictionary<string, string> parameters);
-        string GetPrompt(ChatContext chatContext);
+        string GetPrompt(ExecutionContext context);
         ITool[] GetWorkspaceTools();
     }
 }

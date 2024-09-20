@@ -5,7 +5,7 @@ namespace Agentic.Chat
 {
     public class ChatContext
     {
-        public ChatMessageLinkedList Messages { get; private set; } = new ChatMessageLinkedList();
+        public ChatMessageLinkedList Messages { get; } = new ChatMessageLinkedList();
 
         public void AddMessage(Role role, string content)
         {
