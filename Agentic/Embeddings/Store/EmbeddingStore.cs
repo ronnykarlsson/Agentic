@@ -12,7 +12,6 @@ namespace Agentic.Embeddings.Store
             _documents.Add(document);
         }
 
-
         /// <inheritdoc />
         public List<SearchResult> FindClosestDocuments(float[] queryEmbedding, int limit)
         {

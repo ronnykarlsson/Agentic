@@ -9,12 +9,12 @@ namespace Agentic.Embeddings.Content
 {
     public class RetrievalService : IRetrievalService
     {
-        private readonly IEmbeddingClient _embeddingClient;
+        private readonly IEmbeddingService _embeddingService;
         private readonly IEmbeddingStore _embeddingStore;
 
         public RetrievalService(IEmbeddingContext embeddingContext)
         {
-            _embeddingClient = embeddingContext?.Client ?? throw new ArgumentNullException(nameof(embeddingContext.Client));
+            _embeddingService = embeddingContext?.Service ?? throw new ArgumentNullException(nameof(embeddingContext.Service));
             _embeddingStore = embeddingContext?.Store ?? throw new ArgumentNullException(nameof(embeddingContext.Store));
         }
 
@@ -26,7 +26,7 @@ namespace Agentic.Embeddings.Content
             {
                 try
                 {
-                    float[] embedding = _embeddingClient.GetEmbeddingsAsync(text).GetAwaiter().GetResult();
+                    float[] embedding = _embeddingService.GetEmbedding(text);
                     var searchResults = _embeddingStore.FindClosestDocuments(embedding, topK);
                     allSearchResults.AddRange(searchResults);
                 }

@@ -4,7 +4,7 @@ namespace Agentic.Embeddings.Context
 {
     public interface IEmbeddingContext
     {
-        IEmbeddingClient Client { get; }
+        IEmbeddingService Service { get; }
         IEmbeddingStore Store { get; }
     }
 }

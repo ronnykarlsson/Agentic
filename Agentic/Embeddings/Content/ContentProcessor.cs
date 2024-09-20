@@ -11,13 +11,13 @@ namespace Agentic.Embeddings.Content
 {
     public class ContentProcessor : IContentProcessor
     {
-        private readonly IEmbeddingClient _embeddingClient;
+        private readonly IEmbeddingService _embeddingService;
         private readonly IEmbeddingStore _embeddingStore;
         private int _chunkSize = 512;
 
         public ContentProcessor(IEmbeddingContext embeddingContext)
         {
-            _embeddingClient = embeddingContext?.Client ?? throw new ArgumentNullException(nameof(embeddingContext.Client));
+            _embeddingService = embeddingContext?.Service ?? throw new ArgumentNullException(nameof(embeddingContext.Service));
             _embeddingStore = embeddingContext?.Store ?? throw new ArgumentNullException(nameof(embeddingContext.Store));
         }
 
@@ -76,7 +76,7 @@ namespace Agentic.Embeddings.Content
             {
                 try
                 {
-                    float[] embedding = _embeddingClient.GetEmbeddingsAsync(chunk.Chunk).GetAwaiter().GetResult();
+                    float[] embedding = _embeddingService.GetEmbedding(chunk.Chunk);
                     var metadata = new Dictionary<string, string> { { "source", source } };
                     var document = new Document(Guid.NewGuid().ToString(), chunk.Chunk, embedding, metadata);
                     _embeddingStore.AddDocument(document);
