@@ -62,13 +62,6 @@ namespace Agentic.Chat
                 systemMessageString = $"{systemMessageString}{Environment.NewLine}{workspaceSystemMessageStringBuilder}";
             }
 
-            if (workspaceSystemMessageStringBuilder != null)
-            {
-                var workspaceSystemMessage = workspaceSystemMessageStringBuilder.ToString();
-                var workspaceSystemMessageChatMessage = new ChatMessage(Role.System, workspaceSystemMessage);
-                AddRequestMessage(request, workspaceSystemMessageChatMessage);
-            }
-
             var systemMessage = new ChatMessage(Role.System, systemMessageString);
             AddRequestMessage(request, systemMessage);
 

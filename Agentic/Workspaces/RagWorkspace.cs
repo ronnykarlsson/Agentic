@@ -15,6 +15,7 @@ namespace Agentic.Workspaces
         private readonly IRetrievalService _retrievalService;
         private readonly int _numberOfChatMessages = 3;
         private readonly int _retrieveDocumentCount = 3;
+        private string _header = "Information to use if relevant:";
 
         public RagWorkspace(IContentProcessor contentProcessor, IRetrievalService retrievalService)
         {
@@ -45,6 +46,11 @@ namespace Agentic.Workspaces
             {
                 throw new ArgumentException("Parameters must include either 'file' or 'folder'.");
             }
+
+            if (parameters.TryGetValue("header", out var header))
+            {
+                _header = header;
+            }
         }
 
         public string GetPrompt(ExecutionContext context)
@@ -62,7 +68,9 @@ namespace Agentic.Workspaces
             if (!relevantDocuments.Any()) return null;
 
             string retrievedInfo = string.Join($"{Environment.NewLine}{Environment.NewLine}", relevantDocuments.Select(sr => sr.Content));
-            string prompt = $"Information to use if relevant:{Environment.NewLine}{Environment.NewLine}{retrievedInfo}";
+            if (string.IsNullOrWhiteSpace(_header)) return _header;
+
+            string prompt = $"{_header}{Environment.NewLine}{Environment.NewLine}{retrievedInfo}";
             return prompt;
         }
 
