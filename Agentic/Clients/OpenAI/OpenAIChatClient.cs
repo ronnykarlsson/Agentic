@@ -35,7 +35,7 @@ namespace Agentic.Clients.OpenAI
         }
 
         public OpenAIChatClient(IConfiguration configuration, ClientSettings clientSettings)
-            : base(clientSettings.Tokens)
+            : base(clientSettings.Tokens.Value)
         {
             var apiKey = clientSettings.ApiKey ?? configuration["OpenAI:ApiKey"];
             var baseUrl = clientSettings.BaseUrl ?? "https://api.openai.com/v1";

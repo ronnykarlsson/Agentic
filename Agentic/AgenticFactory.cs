@@ -12,6 +12,7 @@ using Agentic.Embeddings.Cache;
 using Agentic.Embeddings.Context;
 using Agentic.Embeddings.Store;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace Agentic
 {
@@ -19,17 +20,20 @@ namespace Agentic
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IProfileLoader _profileLoader;
+        private readonly IConfiguration _configuration;
 
         private string _profilePath;
 
-        public AgenticFactory(IServiceProvider serviceProvider, IProfileLoader profileLoader)
+        public AgenticFactory(IServiceProvider serviceProvider, IProfileLoader profileLoader, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _profileLoader = profileLoader;
+            _configuration = configuration;
         }
 
         public IChatAgent Create(string path)
         {
+            _profilePath = path;
             var profile = _profileLoader.LoadProfileFromFile(path);
             return Create(profile);
         }
@@ -39,13 +43,18 @@ namespace Agentic
             if (profile == null) throw new ArgumentNullException(nameof(profile));
 
             var agentSettings = profile.Agent;
-            var defaultClientSettings = profile.Client;
+            var clientSettings = profile.Client ?? new ClientSettings();
+
+            // Update client settings with configuration values
+            UpdateClientSettingsFromConfiguration(clientSettings);
 
             var embeddingContext = new EmbeddingContext();
 
             var embeddingClientSettings = profile.EmbeddingClient;
             if (embeddingClientSettings != null)
             {
+                UpdateClientSettingsFromConfiguration(embeddingClientSettings);
+
                 var embeddingClientFactories = CreateInstances<IEmbeddingClientFactory>();
                 var embeddingClientFactory = embeddingClientFactories.FirstOrDefault(m => m.Name == embeddingClientSettings.Name);
                 if (embeddingClientFactory == null) throw new InvalidOperationException($"Embedding client {embeddingClientSettings.Name} not found");
@@ -63,14 +72,33 @@ namespace Agentic
                 embeddingContext.Store = new EmbeddingStore();
             }
 
-            var chatAgent = CreateAgent(agentSettings, defaultClientSettings, null);
+            var chatAgent = CreateAgent(agentSettings, clientSettings, null);
 
             return chatAgent;
+        }
+
+        private void UpdateClientSettingsFromConfiguration(ClientSettings clientSettings)
+        {
+            if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
+
+            var configSection = _configuration.GetSection(clientSettings.Name);
+
+            clientSettings.BaseUrl ??= configSection[nameof(clientSettings.BaseUrl)];
+            clientSettings.ApiKey ??= configSection[nameof(clientSettings.ApiKey)];
+            clientSettings.Model ??= configSection[nameof(clientSettings.Model)];
+
+            var configTokensString = configSection[nameof(clientSettings.Tokens)];
+            if (configTokensString != null && int.TryParse(configTokensString, out var configurationTokens))
+            {
+                clientSettings.Tokens = configurationTokens;
+            }
         }
 
         private ChatAgent CreateAgent(AgentDefinition agentSettings, ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces)
         {
             var clientSettings = agentSettings.Client ?? defaultClientSettings;
+
+            UpdateClientSettingsFromConfiguration(clientSettings);
 
             // Create client to use for the agent
             var chatClientFactories = CreateInstances<IChatClientFactory>();

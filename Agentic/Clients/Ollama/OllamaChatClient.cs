@@ -26,7 +26,7 @@ namespace Agentic.Clients.Ollama
         }
 
         public OllamaChatClient(ClientSettings clientSettings)
-            : base(clientSettings.Tokens)
+            : base(clientSettings.Tokens.Value)
         {
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
 

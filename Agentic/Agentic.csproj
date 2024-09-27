@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/ronnykarlsson/Agentic</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>AI, agents, tools, llm, chat</PackageTags>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
