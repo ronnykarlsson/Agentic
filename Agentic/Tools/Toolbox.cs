@@ -11,6 +11,11 @@ namespace Agentic.Tools
     {
         private ITool[] _tools;
 
+        /// <summary>
+        /// Maximum number of non-tool responses before ending chat, which might occur if AI isn't understanding the instructions.
+        /// </summary>
+        public int MaxNonToolResponses { get; set; } = 1;
+
         public string ChatEndString => "---END---";
 
         public static Toolbox Empty => new Toolbox();
@@ -69,6 +74,7 @@ namespace Agentic.Tools
         public string CreateDefaultSystemMessage(string systemMessage)
         {
             if (_tools == null || !_tools.Any()) return systemMessage;
+            if (MaxNonToolResponses <= 1) return systemMessage;
 
             var endingChatMessage = $"When you have answered ALL questions and finished ALL your current tasks successfully as asked for, or require my input, you MUST say '{ChatEndString}' to let me know that you are done.";
 

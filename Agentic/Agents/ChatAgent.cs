@@ -19,11 +19,6 @@ namespace Agentic.Agents
         public event EventHandler<ChatResponseEventArgs> ChatResponse;
 
         /// <summary>
-        /// Maximum number of non-tool responses before ending chat, which might occur if AI isn't understanding the instructions.
-        /// </summary>
-        public int MaxNonToolResponses { get; set; } = 3;
-
-        /// <summary>
         /// Limit tool response to percentage of token limit.
         /// </summary>
         public float LimitToolResponseSize { get; set; } = 0.6f;
@@ -92,7 +87,7 @@ namespace Agentic.Agents
             ChatMessage previousResponse = null;
             while (true)
             {
-                if (nonToolResponses >= MaxNonToolResponses) break;
+                if (nonToolResponses >= _toolbox.MaxNonToolResponses) break;
 
                 // Chat repeatedly for tool usage until done
                 previousResponse = response;
