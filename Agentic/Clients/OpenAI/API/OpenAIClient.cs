@@ -14,7 +14,7 @@ namespace Agentic.Clients.OpenAI.API
     {
         private ILogger _logger { get; set; }
 
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(4) };
         private readonly string _apiKey;
         private readonly string _baseUrl;
 
