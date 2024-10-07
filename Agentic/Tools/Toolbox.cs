@@ -74,7 +74,6 @@ namespace Agentic.Tools
         public string CreateDefaultSystemMessage(string systemMessage)
         {
             if (_tools == null || !_tools.Any()) return systemMessage;
-            if (MaxNonToolResponses <= 1) return systemMessage;
 
             var endingChatMessage = $"When you have answered ALL questions and finished ALL your current tasks successfully as asked for, or require my input, you MUST say '{ChatEndString}' to let me know that you are done.";
 
