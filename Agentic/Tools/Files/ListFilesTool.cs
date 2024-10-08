@@ -21,7 +21,7 @@ namespace Agentic.Tools.Files
                 return $"Directory not found: {Path.Value}";
             }
 
-            var path = context.GetWorkspace<FileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
+            var path = context.GetWorkspace<IFileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
 
             var searchOption = Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var files = Directory.GetFiles(path, "*", searchOption);

@@ -15,7 +15,7 @@ namespace Agentic.Tools.Files
 
         public string Invoke(ExecutionContext context)
         {
-            var path = context.GetWorkspace<FileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
+            var path = context.GetWorkspace<IFileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
 
             var directory = System.IO.Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))

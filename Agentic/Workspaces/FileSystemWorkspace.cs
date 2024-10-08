@@ -13,7 +13,7 @@ namespace Agentic.Workspaces
     /// <summary>
     /// Path for AI to work inside, always shows the contents of the folder.
     /// </summary>
-    public class FileSystemWorkspace : IWorkspace
+    public class FileSystemWorkspace : IFileSystemWorkspace
     {
         public string BasePath { get; set; }
 
