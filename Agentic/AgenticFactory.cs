@@ -13,6 +13,7 @@ using Agentic.Embeddings.Context;
 using Agentic.Embeddings.Store;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Agentic.Helpers;
 
 namespace Agentic
 {
@@ -33,7 +34,7 @@ namespace Agentic
 
         public IChatAgent Create(string path)
         {
-            _profilePath = path;
+            _profilePath = FileHelpers.ResolvePath(path);
             var profile = _profileLoader.LoadProfileFromFile(path);
             return Create(profile);
         }
@@ -82,10 +83,12 @@ namespace Agentic
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
 
             var configSection = _configuration.GetSection(clientSettings.Name);
+            var agenticConfigSection = _configuration.GetSection("Agentic");
+            var agenticClientConfigSection = agenticConfigSection.GetSection("Client");
 
-            clientSettings.BaseUrl ??= configSection[nameof(clientSettings.BaseUrl)];
-            clientSettings.ApiKey ??= configSection[nameof(clientSettings.ApiKey)];
-            clientSettings.Model ??= configSection[nameof(clientSettings.Model)];
+            clientSettings.BaseUrl ??= configSection[nameof(clientSettings.BaseUrl)] ?? agenticClientConfigSection[nameof(clientSettings.BaseUrl)];
+            clientSettings.ApiKey ??= configSection[nameof(clientSettings.ApiKey)] ?? agenticClientConfigSection[nameof(clientSettings.ApiKey)];
+            clientSettings.Model ??= configSection[nameof(clientSettings.Model)] ?? agenticClientConfigSection[nameof(clientSettings.Model)];
 
             var configTokensString = configSection[nameof(clientSettings.Tokens)];
             if (configTokensString != null && int.TryParse(configTokensString, out var configurationTokens))
