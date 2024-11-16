@@ -32,6 +32,7 @@ namespace Agentic.Agents
         private ChatContext _chatContext;
         private Toolbox _toolbox;
         private IWorkspace[] _workspaces;
+        private Func<FollowUpAgentPrompt> _followUpAgentFactory;
 
         public ChatAgent(IChatClient client)
         {
@@ -48,6 +49,11 @@ namespace Agentic.Agents
 
         /// <inheritdoc/>
         public void Initialize(string systemMessage, Toolbox toolbox, IWorkspace[] workspaces)
+        {
+            Initialize(systemMessage, toolbox, workspaces, null);
+        }
+
+        public void Initialize(string systemMessage, Toolbox toolbox, IWorkspace[] workspaces, Func<FollowUpAgentPrompt> followUpAgentFactory)
         {
             _client.SetSystemMessage(systemMessage);
 
@@ -70,6 +76,7 @@ namespace Agentic.Agents
 
             _workspaces = workspaces;
             _client.SetWorkspaces(workspaces);
+            _followUpAgentFactory = followUpAgentFactory;
         }
 
         /// <inheritdoc/>
@@ -89,7 +96,6 @@ namespace Agentic.Agents
             {
                 if (nonToolResponses >= _toolbox.MaxNonToolResponses) break;
 
-                // Chat repeatedly for tool usage until done
                 previousResponse = response;
                 response = await _client.SendAsync(_chatContext).ConfigureAwait(false);
 
@@ -117,7 +123,7 @@ namespace Agentic.Agents
                 if (tool != null)
                 {
                     if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
-                    
+
                     var executionContext = new ExecutionContext
                     {
                         Messages = _chatContext.Messages,
@@ -144,7 +150,6 @@ namespace Agentic.Agents
                         Agent = this
                     });
 
-                    // Reset non-tool response counter when using tools
                     nonToolResponses = 0;
                 }
                 else
@@ -155,6 +160,13 @@ namespace Agentic.Agents
 
                 if (tool == null && isEnded) break;
                 if (previousResponse != null && response.Content == previousResponse.Content) break;
+            }
+
+            if (_followUpAgentFactory != null)
+            {
+                var followUpAgent = _followUpAgentFactory();
+                var followUpResponse = await FollowUpAsync(followUpAgent.Agent, followUpAgent.Prompt);
+                responses.Add(followUpResponse);
             }
 
             return string.Join("\n", responses);
@@ -174,9 +186,22 @@ namespace Agentic.Agents
 
         private string StripAnsiColorCodes(string text)
         {
-            // ANSI color code pattern
             var ansiCodePattern = @"\x1B\[[0-9;]*m";
             return Regex.Replace(text, ansiCodePattern, string.Empty);
+        }
+
+        private async Task<string> FollowUpAsync(ChatAgent agent, string message)
+        {
+            var followUpAgentFactory = _followUpAgentFactory;
+
+            // Send follow up message to another agent
+            if (agent != this) return await agent.ChatAsync(message).ConfigureAwait(false);
+
+            // Send follow up message to the same agent
+            _followUpAgentFactory = null;
+            var response = await agent.ChatAsync(message).ConfigureAwait(false);
+            _followUpAgentFactory = followUpAgentFactory;
+            return response;
         }
 
         internal void OnChatResponse(ChatResponseEventArgs eventArgs)

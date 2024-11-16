@@ -8,5 +8,6 @@
         public WorkspaceDefinition[] Workspaces { get; set; }
         public ToolDefinition[] Tools { get; set; }
         public AgentDefinition[] Partners { get; set; }
+        public FollowUpDefinition FollowUp { get; set; }
     }
 }

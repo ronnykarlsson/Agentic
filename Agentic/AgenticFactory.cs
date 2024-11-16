@@ -174,9 +174,54 @@ namespace Agentic
                 }
             }
 
-            chatAgent.Initialize(agentSettings.Prompt, toolbox, workspaces);
+            var followUpAgentFactory = agentSettings.FollowUp != null
+                ? CreateFollowUpAgentFactory(defaultClientSettings, workspaces, chatAgent, agentSettings.FollowUp)
+                : null;
+            chatAgent.Initialize(agentSettings.Prompt, toolbox, workspaces, followUpAgentFactory);
 
             return chatAgent;
+        }
+
+        private Func<FollowUpAgentPrompt> CreateFollowUpAgentFactory(ClientSettings defaultClientSettings, IWorkspace[] inputWorkspaces, ChatAgent parent, FollowUpDefinition followUp)
+        {
+            return () =>
+            {
+                ChatAgent followUpAgent;
+                if (followUp.Agent != null)
+                {
+                    followUpAgent = CreateAgent(followUp.Agent, defaultClientSettings, inputWorkspaces);
+
+                    Func<FollowUpAgentPrompt> followUpFactory = null;
+                    var nextFollowUp = followUp.Agent?.FollowUp;
+                    if (nextFollowUp != null)
+                    {
+                        followUpFactory = CreateFollowUpAgentFactory(defaultClientSettings, inputWorkspaces, followUpAgent, nextFollowUp);
+                    }
+
+                    // Forward chat responses from follow-up agent to parent agent
+                    followUpAgent.ChatResponse += (sender, e) =>
+                    {
+                        parent.OnChatResponse(e);
+                    };
+
+                    // Share context with both agents
+                    var parentContext = parent.GetContext();
+                    followUpAgent.SetContext(parentContext);
+                }
+                else
+                {
+                    // Follow up with same agent if no new agent is specified
+                    followUpAgent = parent;
+                }
+
+                var response = new FollowUpAgentPrompt
+                {
+                    Agent = followUpAgent,
+                    Prompt = followUp.Prompt
+                };
+
+                return response;
+            };
         }
 
         private IWorkspace[] CreateWorkspaces(WorkspaceDefinition[] workspaceDefinitions)
