@@ -26,7 +26,7 @@ namespace Agentic.Clients.OpenAI
         {
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
 
-            _client = new OpenAIClient(clientSettings.ApiKey, clientSettings.BaseUrl ?? "http://127.0.0.1:11434");
+            _client = new OpenAIClient(clientSettings.ApiKey, clientSettings.BaseUrl ?? "https://api.openai.com/v1");
             _model = clientSettings.Model;
         }
 
