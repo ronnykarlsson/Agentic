@@ -1,8 +1,8 @@
 ﻿using Agentic.Agents;
 using Agentic.Chat;
-using Agentic.Helpers;
 using Agentic.Tools;
 using Agentic.Tools.Files;
+using Agentic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,7 +51,7 @@ namespace Agentic.Workspaces
             parameters.TryGetValue("path", out string path);
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Path is required for FileSystemWorkspace.");
 
-            path = FileHelpers.ResolvePath(path);
+            path = FilePathResolver.ResolvePath(path);
 
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 

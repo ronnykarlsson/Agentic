@@ -13,7 +13,7 @@ using Agentic.Embeddings.Context;
 using Agentic.Embeddings.Store;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using Agentic.Helpers;
+using Agentic.Utilities;
 
 namespace Agentic
 {
@@ -34,8 +34,8 @@ namespace Agentic
 
         public IChatAgent Create(string path)
         {
-            _profilePath = FileHelpers.ResolvePath(path);
-            var profile = _profileLoader.LoadProfileFromFile(path);
+            _profilePath = FilePathResolver.ResolvePath(path);
+            var profile = _profileLoader.LoadProfileFromFile(_profilePath);
             return Create(profile);
         }
 
@@ -62,12 +62,7 @@ namespace Agentic
 
                 var embeddingClient = embeddingClientFactory.CreateEmbeddingClient(embeddingClientSettings);
 
-                var cacheFolder = ".agentic/embeddings";
-                if (!string.IsNullOrEmpty(_profilePath))
-                {
-                    var profileDirectory = Path.GetDirectoryName(_profilePath);
-                    if (profileDirectory != null) cacheFolder = Path.Combine(profileDirectory, cacheFolder);
-                }
+                var cacheFolder = Path.Combine(profile.Cache.Folder, "embeddings");
 
                 embeddingContext.Service = new EmbeddingService(embeddingClient, new FileEmbeddingCache(cacheFolder, $"{embeddingClientSettings.Name.ToLowerInvariant()}-{embeddingClientSettings.Model.ToLowerInvariant()}"));
                 embeddingContext.Store = new EmbeddingStore();

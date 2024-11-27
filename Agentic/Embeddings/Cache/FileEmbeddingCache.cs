@@ -1,4 +1,4 @@
-﻿using Agentic.Helpers;
+﻿using Agentic.Utilities;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -9,6 +9,7 @@ namespace Agentic.Embeddings.Cache
     public class FileEmbeddingCache : IEmbeddingCache
     {
         private readonly string _cacheDirectory;
+        private readonly string _modelCacheDirectory;
         private readonly string _sessionName;
         private readonly object _lock = new object();
 
@@ -17,19 +18,9 @@ namespace Agentic.Embeddings.Cache
             _cacheDirectory = cacheDirectory ?? throw new ArgumentNullException(nameof(cacheDirectory));
             _sessionName = sessionName ?? throw new ArgumentNullException(nameof(sessionName));
 
-            _cacheDirectory = FileHelpers.ResolvePath(_cacheDirectory);
-            Directory.CreateDirectory(GetModelCacheDirectory());
-        }
-
-        private string GetModelCacheDirectory()
-        {
-            return Path.Combine(_cacheDirectory, _sessionName);
-        }
-
-        private string GetEmbeddingFilePath(string text)
-        {
-            string fileName = $"{ComputeHash(text)}.emb";
-            return Path.Combine(GetModelCacheDirectory(), fileName);
+            _cacheDirectory = FilePathResolver.ResolvePath(_cacheDirectory);
+            _modelCacheDirectory = Path.Combine(_cacheDirectory, _sessionName);
+            Directory.CreateDirectory(_modelCacheDirectory);
         }
 
         public bool TryGetEmbedding(string text, out float[] embedding)
@@ -55,6 +46,12 @@ namespace Agentic.Embeddings.Cache
                     SaveEmbeddingToFile(filePath, embedding);
                 }
             }
+        }
+
+        private string GetEmbeddingFilePath(string text)
+        {
+            string fileName = $"{ComputeHash(text)}.emb";
+            return Path.Combine(_modelCacheDirectory, fileName);
         }
 
         private void SaveEmbeddingToFile(string filePath, float[] embedding)
