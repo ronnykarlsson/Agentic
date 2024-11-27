@@ -17,7 +17,7 @@ namespace Agentic.Workspaces
     {
         public string BasePath { get; set; }
 
-        public string GetPrompt(ExecutionContext context)
+        public string GetPrompt(AgentExecutionContext context)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Working directory: {BasePath}");

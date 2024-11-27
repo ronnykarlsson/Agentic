@@ -9,7 +9,7 @@ namespace Agentic.Tools.Browser
         public override string Description => "Click element on page";
         public ToolParameter<string> Id { get; set; }
 
-        public override string Invoke(ExecutionContext context)
+        public override string Invoke(AgentExecutionContext context)
         {
             if (string.IsNullOrWhiteSpace(Id.Value))
             {

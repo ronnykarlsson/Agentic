@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace Agentic.Agents
 {
-    public class ExecutionContext
+    public class AgentExecutionContext
+
     {
         public ChatMessageLinkedList Messages { get; set; }
         public IWorkspace[] Workspaces { get; set; }

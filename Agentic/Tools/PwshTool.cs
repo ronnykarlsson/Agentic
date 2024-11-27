@@ -12,7 +12,7 @@ namespace Agentic.Tools
         public bool RequireConfirmation { get; } = true;
         public ToolParameter<string> Script { get; set; }
 
-        public string Invoke(ExecutionContext context)
+        public string Invoke(AgentExecutionContext context)
         {
             var script = Script.Value;
 

@@ -124,7 +124,7 @@ namespace Agentic.Agents
                 {
                     if (_toolConfirmation != null && tool.RequireConfirmation && !_toolConfirmation.Confirm(tool)) break;
 
-                    var executionContext = new ExecutionContext
+                    var executionContext = new AgentExecutionContext
                     {
                         Messages = _chatContext.Messages,
                         Workspaces = _workspaces

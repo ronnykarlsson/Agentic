@@ -43,7 +43,7 @@ namespace Agentic.Chat
             StringBuilder workspaceSystemMessageStringBuilder = null;
             if (Workspaces != null && Workspaces.Length > 0)
             {
-                var executionContext = new ExecutionContext
+                var executionContext = new AgentExecutionContext
                 {
                     Messages = chatContext.Messages,
                     Workspaces = Workspaces

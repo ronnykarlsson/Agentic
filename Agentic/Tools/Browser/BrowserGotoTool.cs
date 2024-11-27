@@ -9,7 +9,7 @@ namespace Agentic.Tools.Browser
         public override string Description => "Navigate to URL using browser";
         public ToolParameter<string> Url { get; set; }
 
-        public override string Invoke(ExecutionContext context)
+        public override string Invoke(AgentExecutionContext context)
         {
             var playwright = Playwright.CreateAsync().GetAwaiter().GetResult();
 

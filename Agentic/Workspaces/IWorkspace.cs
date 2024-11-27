@@ -11,7 +11,7 @@ namespace Agentic.Workspaces
     public interface IWorkspace
     {
         void Initialize(Dictionary<string, string> parameters);
-        string GetPrompt(ExecutionContext context);
+        string GetPrompt(AgentExecutionContext context);
         ITool[] GetWorkspaceTools();
     }
 }

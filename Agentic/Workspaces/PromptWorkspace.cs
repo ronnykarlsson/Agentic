@@ -18,7 +18,7 @@ namespace Agentic.Workspaces
             Prompt = prompt;
         }
 
-        public string GetPrompt(ExecutionContext context)
+        public string GetPrompt(AgentExecutionContext context)
         {
             return Prompt;
         }

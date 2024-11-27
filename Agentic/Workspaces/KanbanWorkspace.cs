@@ -16,7 +16,7 @@ namespace Agentic.Workspaces
 
         public List<KanbanWorkItem> WorkItems { get; } = new List<KanbanWorkItem>();
 
-        public string GetPrompt(ExecutionContext context)
+        public string GetPrompt(AgentExecutionContext context)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(Name);
@@ -71,7 +71,7 @@ namespace Agentic.Workspaces
             public ToolParameter<string> TicketName { get; set; }
             public ToolParameter<string> TicketDescription { get; set; }
 
-            public string Invoke(ExecutionContext context)
+            public string Invoke(AgentExecutionContext context)
             {
                 var workspace = _kanbanWorkspace ?? context.GetWorkspace<KanbanWorkspace>();
                 if (workspace == null) return "No Kanban workspace found";
@@ -105,7 +105,7 @@ namespace Agentic.Workspaces
 
             public ToolParameter<string> TicketName { get; set; }
 
-            public string Invoke(ExecutionContext context)
+            public string Invoke(AgentExecutionContext context)
             {
                 var workspace = _kanbanWorkspace ?? context.GetWorkspace<KanbanWorkspace>();
                 if (workspace == null) return "No Kanban workspace found";

@@ -53,7 +53,7 @@ namespace Agentic.Workspaces
             }
         }
 
-        public string GetPrompt(ExecutionContext context)
+        public string GetPrompt(AgentExecutionContext context)
         {
             if (context?.Messages == null)
                 throw new ArgumentNullException(nameof(context), "ChatContext or Messages cannot be null.");

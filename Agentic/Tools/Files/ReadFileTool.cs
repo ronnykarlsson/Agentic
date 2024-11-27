@@ -12,7 +12,7 @@ namespace Agentic.Tools.Files
 
         public ToolParameter<string> Path { get; set; }
 
-        public string Invoke(ExecutionContext context)
+        public string Invoke(AgentExecutionContext context)
         {
             var path = context.GetWorkspace<IFileSystemWorkspace>()?.GetPath(Path.Value) ?? Path.Value;
 

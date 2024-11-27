@@ -7,6 +7,6 @@ namespace Agentic.Tools
         string Tool { get; }
         string Description { get; }
         bool RequireConfirmation { get; }
-        string Invoke(ExecutionContext context);
+        string Invoke(AgentExecutionContext context);
     }
 }
