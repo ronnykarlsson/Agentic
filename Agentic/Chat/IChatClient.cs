@@ -1,5 +1,6 @@
 ﻿using Agentic.Tools;
 using Agentic.Workspaces;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Agentic.Chat
@@ -10,7 +11,7 @@ namespace Agentic.Chat
         void SetTools(Toolbox toolbox);
         void SetWorkspaces(IWorkspace[] workspaces);
         Task<ChatMessage> SendAsync(ChatContext chatContext);
-        Task<ChatMessage> SendAsync(ChatContext chatContext, ChatMessage message);
+        Task<ChatMessage> SendAsync(ChatContext chatContext, IList<ChatMessage> additionalMessages);
         string LimitMessageSize(string message, float percentMaxTokens);
     }
 }

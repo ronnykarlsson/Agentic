@@ -14,6 +14,7 @@ using Agentic.Embeddings.Store;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Agentic.Utilities;
+using Agentic.Chat.Middleware;
 
 namespace Agentic
 {
@@ -113,7 +114,7 @@ namespace Agentic
             }
 
             var workspaces = (inputWorkspaces ?? Array.Empty<IWorkspace>()).Concat(agentWorkspaces).ToArray();
-
+            
             // Create toolbox for the agent
             var toolbox = Toolbox.Empty;
             if (agentSettings.Tools != null && agentSettings.Tools.Length > 0)
@@ -121,7 +122,15 @@ namespace Agentic
                 toolbox = CreateTools(agentSettings.Tools);
             }
 
-            var chatAgent = new ChatAgent(chatClient);
+            var agentChatClient = chatClient;
+            if (agentSettings.Refine != null)
+            {
+                var chatClientWrapper = new ChatClientWrapper(chatClient);
+                chatClientWrapper.Use(new RefinementChatMiddleware(agentSettings.Refine));
+                agentChatClient = chatClientWrapper;
+            }
+
+            var chatAgent = new ChatAgent(agentChatClient);
             chatAgent.Name = agentSettings.Name;
 
             // Create partner agents and assign chat tool

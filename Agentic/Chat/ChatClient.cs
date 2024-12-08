@@ -5,6 +5,7 @@ using Agentic.Workspaces;
 using SharpToken;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,7 +74,7 @@ namespace Agentic.Chat
             return chatMessage;
         }
 
-        public virtual async Task<ChatMessage> SendAsync(ChatContext chatContext, ChatMessage message)
+        public virtual async Task<ChatMessage> SendAsync(ChatContext chatContext, IList<ChatMessage> additionalMessages)
         {
             if (string.IsNullOrWhiteSpace(SystemMessage))
             {
@@ -85,8 +86,8 @@ namespace Agentic.Chat
             var systemMessage = new ChatMessage(Role.System, toolsSystemMessage);
             var tokens = MaxTokens - CalculateTokens(systemMessage);
 
-            // Calculate max tokens including user message
-            var messageTokens = CalculateTokens(message);
+            // Calculate max tokens including additional message
+            var messageTokens = additionalMessages.Sum(CalculateTokens);
             tokens = tokens - messageTokens;
             if (tokens < 0) throw new ChatException("Message is too long");
 
@@ -94,7 +95,11 @@ namespace Agentic.Chat
 
             AddRequestMessage(request, systemMessage);
             AddRequestMessages(chatContext, request, tokens);
-            AddRequestMessage(request, message);
+
+            foreach (var message in additionalMessages)
+            {
+                AddRequestMessage(request, message);
+            }
 
             var chatMessage = await SendRequestAsync(request).ConfigureAwait(false);
 

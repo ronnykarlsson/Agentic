@@ -9,5 +9,6 @@
         public ToolDefinition[] Tools { get; set; }
         public AgentDefinition[] Partners { get; set; }
         public FollowUpDefinition FollowUp { get; set; }
+        public RefinementDefinition Refine { get; set; }
     }
 }
