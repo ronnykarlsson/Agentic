@@ -2,7 +2,7 @@
 using Agentic.Exceptions;
 using Agentic.Tools;
 using Agentic.Workspaces;
-using SharpToken;
+using Microsoft.ML.Tokenizers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +16,8 @@ namespace Agentic.Chat
         protected string SystemMessage;
         protected Toolbox Toolbox;
         protected IWorkspace[] Workspaces;
+
+        TiktokenTokenizer _tokenizer = TiktokenTokenizer.CreateForModel("gpt-4o");
 
         public int MaxTokens { get; }
 
@@ -165,7 +167,8 @@ namespace Agentic.Chat
         protected virtual int CalculateTokens(string message)
         {
             if (string.IsNullOrEmpty(message)) return 0;
-            return GptEncoding.GetEncodingForModel("gpt-4").Encode(message).Count;
+            var tokens = _tokenizer.CountTokens(message);
+            return tokens;
         }
     }
 }
