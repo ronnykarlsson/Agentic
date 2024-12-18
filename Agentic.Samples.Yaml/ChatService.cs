@@ -11,7 +11,7 @@
 
         public void StartChat()
         {
-            var chatAgent = _agenticFactory.Create("ragAgent.yml");
+            var chatAgent = _agenticFactory.CreateFromFile("ragAgent.yml");
 
             chatAgent.ChatResponse += (sender, eventArgs) =>
             {

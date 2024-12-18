@@ -6,6 +6,7 @@ namespace Agentic
     public interface IAgenticFactory
     {
         IChatAgent Create(AgenticProfile profile);
-        IChatAgent Create(string path);
+        IChatAgent CreateFromString(string yamlProfile);
+        IChatAgent CreateFromFile(string path);
     }
 }

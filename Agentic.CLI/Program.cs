@@ -46,7 +46,7 @@ namespace Agentic.CLI
 
             var agenticFactory = serviceProvider.GetRequiredService<IAgenticFactory>();
 
-            var agent = agenticFactory.Create(options.Agent);
+            var agent = agenticFactory.CreateFromFile(options.Agent);
 
             agent.ChatResponse += (sender, eventArgs) =>
             {

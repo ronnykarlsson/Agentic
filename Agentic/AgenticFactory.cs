@@ -33,10 +33,16 @@ namespace Agentic
             _configuration = configuration;
         }
 
-        public IChatAgent Create(string path)
+        public IChatAgent CreateFromFile(string path)
         {
             _profilePath = FilePathResolver.ResolvePath(path);
             var profile = _profileLoader.LoadProfileFromFile(_profilePath);
+            return Create(profile);
+        }
+
+        public IChatAgent CreateFromString(string yamlProfile)
+        {
+            var profile = _profileLoader.LoadProfileFromString(yamlProfile);
             return Create(profile);
         }
 
