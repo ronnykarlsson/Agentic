@@ -1,0 +1,84 @@
+﻿@page "/"
+@using Agentic.Exceptions
+@using Captain.Web.Client.Services
+@using Captain.Web.Client.Models
+@rendermode InteractiveWebAssembly
+@inject IJSRuntime JSRuntime
+@inject AgentService AgentService
+@inject SettingsService SettingsService
+
+<PageTitle>Chat</PageTitle>
+
+@if (!isChatStarted)
+{
+    <h1>Welcome to OpenCaptain</h1>
+
+    <p>This platform allows you to interact with custom agents and AI providers seamlessly. To get started, please select an agent and a client from the options below.</p>
+
+    @if (uiClients == null || !uiClients.Any())
+    {
+        <p>No clients configured. Please go to <a href="/settings">Settings</a> to configure a client before using the chat.</p>
+    }
+
+    <EditForm Model="this" OnValidSubmit="StartChat">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="agentSelect" class="form-label">Select Agent:</label>
+            <select id="agentSelect" class="form-select" @bind="selectedAgentName" required>
+                <option value="">-- Select an Agent --</option>
+                @foreach (var agent in agents)
+                {
+                    <option value="@agent.Name">@agent.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="clientSelect" class="form-label">Select Client:</label>
+            <select id="clientSelect" class="form-select" @bind="selectedClientName" required>
+                <option value="">-- Select a Client --</option>
+                @foreach (var uiClient in uiClients)
+                {
+                    <option value="@uiClient.ClientDisplayName">@uiClient.ClientDisplayName</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Start Chat</button>
+    </EditForm>
+}
+
+@if (isChatStarted)
+{
+    <Chat Agent="@selectedAgentName" Client="@selectedClientName" />
+    <button class="btn btn-secondary mt-3" @onclick="CloseChat">Close Chat</button>
+}
+
+@code {
+    private List<Agent> agents = new();
+    private List<UIClientSettings>? uiClients = new();
+    private string? selectedClientName;
+    private string? selectedAgentName;
+    private bool isChatStarted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        agents = await AgentService.ListAgentsAsync();
+        uiClients = await SettingsService.LoadSettingsAsync();
+    }
+
+    private void StartChat()
+    {
+        if (!string.IsNullOrEmpty(selectedAgentName) && !string.IsNullOrEmpty(selectedClientName))
+        {
+            isChatStarted = true;
+        }
+    }
+
+    private void CloseChat()
+    {
+        isChatStarted = false;
+    }
+}

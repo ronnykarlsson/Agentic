@@ -18,7 +18,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agentic.Tests", "Agentic.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agentic.Samples.Yaml", "Agentic.Samples.Yaml\Agentic.Samples.Yaml.csproj", "{8A661996-6FF5-4229-BBCB-02AFE7F3C449}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agentic.CLI", "Agentic.CLI\Agentic.CLI.csproj", "{5CF014D3-9A1B-4B5A-A323-FB8C35F6126A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agentic.CLI", "Agentic.CLI\Agentic.CLI.csproj", "{5CF014D3-9A1B-4B5A-A323-FB8C35F6126A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Captain.Web", "Captain.Web\Captain.Web\Captain.Web.csproj", "{2835BDDA-F6EC-4AAD-ACFD-FF96F5212C05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Captain.Web.Client", "Captain.Web\Captain.Web.Client\Captain.Web.Client.csproj", "{5A9958AD-B835-4B48-B589-ED5DEB886C4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +50,14 @@ Global
 		{5CF014D3-9A1B-4B5A-A323-FB8C35F6126A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CF014D3-9A1B-4B5A-A323-FB8C35F6126A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CF014D3-9A1B-4B5A-A323-FB8C35F6126A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2835BDDA-F6EC-4AAD-ACFD-FF96F5212C05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2835BDDA-F6EC-4AAD-ACFD-FF96F5212C05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2835BDDA-F6EC-4AAD-ACFD-FF96F5212C05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2835BDDA-F6EC-4AAD-ACFD-FF96F5212C05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A9958AD-B835-4B48-B589-ED5DEB886C4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A9958AD-B835-4B48-B589-ED5DEB886C4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A9958AD-B835-4B48-B589-ED5DEB886C4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A9958AD-B835-4B48-B589-ED5DEB886C4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

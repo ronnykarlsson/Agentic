@@ -38,7 +38,7 @@ namespace Agentic.Clients.OpenAI
             : base(clientSettings.Tokens.Value)
         {
             var apiKey = clientSettings.ApiKey ?? configuration["OpenAI:ApiKey"];
-            var baseUrl = clientSettings.BaseUrl ?? "https://api.openai.com/v1";
+            var baseUrl = clientSettings.Url ?? "https://api.openai.com/v1";
 
             _client = new OpenAIClient(apiKey, baseUrl);
             _model = clientSettings.Model;
@@ -53,7 +53,7 @@ namespace Agentic.Clients.OpenAI
             }
             catch (HttpRequestException e)
             {
-                throw new ChatException("Failed to send request", e);
+                throw new ChatException($"Failed to send request: {e.Message}", e);
             }
 
             var responseMessage = response.Choices.First().Message.Content;

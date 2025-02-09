@@ -46,6 +46,12 @@ namespace Agentic
             return Create(profile);
         }
 
+        public IChatAgent CreateFromString(string yamlProfile, ClientSettings clientSettings)
+        {
+            var profile = _profileLoader.LoadProfileFromString(yamlProfile);
+            return Create(profile, clientSettings);
+        }
+
         public IChatAgent Create(AgenticProfile profile)
         {
             if (profile == null) throw new ArgumentNullException(nameof(profile));
@@ -80,15 +86,23 @@ namespace Agentic
             return chatAgent;
         }
 
+        public IChatAgent Create(AgenticProfile profile, ClientSettings clientSettings)
+        {
+            var agentSettings = profile.Agent;
+            var chatAgent = CreateAgent(agentSettings, clientSettings, null);
+            return chatAgent;
+        }
+
         private void UpdateClientSettingsFromConfiguration(ClientSettings clientSettings)
         {
             if (clientSettings == null) throw new ArgumentNullException(nameof(clientSettings));
+            if (clientSettings.Name == null) throw new ArgumentException(nameof(clientSettings), $"{nameof(ClientSettings)}.{nameof(ClientSettings.Name)} missing");
 
             var configSection = _configuration.GetSection(clientSettings.Name);
             var agenticConfigSection = _configuration.GetSection("Agentic");
             var agenticClientConfigSection = agenticConfigSection.GetSection("Client");
 
-            clientSettings.BaseUrl ??= configSection[nameof(clientSettings.BaseUrl)] ?? agenticClientConfigSection[nameof(clientSettings.BaseUrl)];
+            clientSettings.Url ??= configSection[nameof(clientSettings.Url)] ?? agenticClientConfigSection[nameof(clientSettings.Url)];
             clientSettings.ApiKey ??= configSection[nameof(clientSettings.ApiKey)] ?? agenticClientConfigSection[nameof(clientSettings.ApiKey)];
             clientSettings.Model ??= configSection[nameof(clientSettings.Model)] ?? agenticClientConfigSection[nameof(clientSettings.Model)];
 

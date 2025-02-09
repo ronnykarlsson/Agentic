@@ -1,0 +1,133 @@
+﻿@page "/agents"
+@rendermode InteractiveWebAssembly
+@inject AgentService AgentService
+
+<h3 class="mb-4">Manage Agents</h3>
+
+@if (isEditing)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <EditForm Model="currentAgent" OnValidSubmit="SaveAgent">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="mb-3" />
+
+                <div class="mb-3">
+                    <label for="agentName" class="form-label">Name:</label>
+                    <InputText id="agentName" class="form-control" @bind-Value="currentAgent.Name" disabled="@isDefaultAgent" />
+                </div>
+                <div class="mb-3">
+                    <label for="agentProfile" class="form-label">Profile:</label>
+                    <InputTextArea id="agentProfile" class="form-control" @bind-Value="currentAgent.Profile" rows="10" />
+                </div>
+                <div class="d-flex justify-content-end">
+                    @if (!isDefaultAgent)
+                    {
+                        <button type="submit" class="btn btn-success me-2">Save</button>
+                    }
+                    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Close</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+else
+{
+    <div class="mb-4">
+        <button class="btn btn-primary" @onclick="AddNewAgent">Add New Agent</button>
+    </div>
+}
+
+@if (agents == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Profile</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var agent in agents)
+                {
+                    <tr>
+                        <td>@agent.Name</td>
+                        <td class="text-truncate" style="max-width: 400px;">@agent.Profile</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm me-2" @onclick="() => EditAgent(agent)">Edit</button>
+                            @if (!agent.IsDefault)
+                            {
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteAgent(agent)">Delete</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Agent> agents;
+    private Agent currentAgent = new Agent();
+    private bool isEditing = false;
+    private bool isDefaultAgent = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        agents = await AgentService.ListAgentsAsync();
+    }
+
+    private void AddNewAgent()
+    {
+        currentAgent = new Agent
+        {
+                Profile =
+@"agent:
+  name: Assistant
+  prompt: |
+    You are a helpful assistant.
+"
+        };
+        isEditing = true;
+        isDefaultAgent = false;
+    }
+
+    private void EditAgent(Agent agent)
+    {
+        currentAgent = new Agent
+        {
+            Name = agent.Name,
+            Profile = agent.Profile
+        };
+        isEditing = true;
+        isDefaultAgent = agent.IsDefault;
+    }
+
+    private async Task SaveAgent()
+    {
+        if (!isDefaultAgent)
+        {
+            await AgentService.AddOrUpdateAgentAsync(currentAgent);
+            agents = await AgentService.ListAgentsAsync();
+        }
+        isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+    }
+
+    private async Task DeleteAgent(Agent agent)
+    {
+        agents.Remove(agent);
+        await AgentService.SaveAgentsAsync(agents);
+    }
+}

@@ -1,0 +1,146 @@
+﻿@page "/chat/{client}/{agent}"
+@using Captain.Web.Client.Chat
+@using Markdig
+@rendermode InteractiveWebAssembly
+@inject IJSRuntime JSRuntime
+@inject ChatService ChatService
+
+<p>Chat with @Agent using @Client</p>
+
+<div class="chat-container" @ref="chatContainer">
+    <ul class="chat-messages">
+        @foreach (var message in messages)
+        {
+            <li class="@(message.Source == "User"
+                ? "user-message"
+                : message.Source == "AI"
+                    ? "ai-message"
+                    : "error-message")">
+                @((MarkupString)ConvertMarkdownToHtml(message.Content))
+            </li>
+        }
+    </ul>
+</div>
+
+<div class="input-container">
+    <textarea
+        @bind="userInput"
+        @bind:event="oninput"
+        @onkeypress="HandleKeyPress"
+        @ref="textInput"
+        placeholder="Type your message..."
+        rows="3"
+        disabled="@isLoading"
+    ></textarea>
+    <button class="btn btn-primary" @onclick="SendMessage" disabled="@isLoading">
+        @if (isLoading) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }
+        Send
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Agent { get; set; }
+    [Parameter] public string Client { get; set; }
+
+    private IJSObjectReference jsModule;
+
+    private bool shouldScrollToBottom = false;
+    private string userInput = "";
+    private List<ChatMessage> messages = new List<ChatMessage>();
+    private bool isLoading = false;
+    private ElementReference chatContainer;
+    private ElementReference textInput;
+
+    MarkdownPipeline markdownPipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .UseSoftlineBreakAsHardlineBreak()
+        .UseBootstrap()
+        .Build();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChatService.InitializeAsync(Agent, Client);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Chat.razor.js");
+            await FocusTextInput();
+        }
+
+        if (shouldScrollToBottom)
+        {
+            shouldScrollToBottom = false;
+            await ScrollToBottom();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(userInput))
+        {
+            messages.Add(new ChatMessage("User", userInput));
+            isLoading = true;
+
+            var sentInput = userInput;
+            userInput = "";
+            shouldScrollToBottom = true;
+
+            StateHasChanged();
+
+            try
+            {
+                var response = await ChatService.ChatAsync(sentInput);
+                messages.Add(new ChatMessage("AI", response));
+                shouldScrollToBottom = true;
+            }
+            catch (Exception ex)
+            {
+                messages.Add(new ChatMessage("Error", ex.Message));
+                shouldScrollToBottom = true;
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+
+                await FocusTextInput();
+            }
+        }
+    }
+
+    private async Task ScrollToBottom()
+    {
+        if (jsModule == null) return;
+        await jsModule.InvokeVoidAsync("scrollToBottom", chatContainer);
+    }
+
+
+    private async Task FocusTextInput()
+    {
+        await textInput.FocusAsync();
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey && !string.IsNullOrWhiteSpace(userInput))
+        {
+            await SendMessage();
+        }
+    }
+
+    private string ConvertMarkdownToHtml(string markdown)
+    {
+        return Markdown.ToHtml(markdown, markdownPipeline);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (jsModule != null)
+        {
+            await jsModule.DisposeAsync();
+        }
+    }
+}
