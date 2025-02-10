@@ -2,6 +2,8 @@
 
 Agentic is a .NET framework for programming AI agents with access to tools.
 
+Go to https://www.opencaptain.com to try the tool.
+
 ## Example
 
 ```c#
