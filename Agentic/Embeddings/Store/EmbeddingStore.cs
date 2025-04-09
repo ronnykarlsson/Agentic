@@ -20,12 +20,18 @@ namespace Agentic.Embeddings.Store
             foreach (var document in _documents)
             {
                 double similarity = CosineSimilarity(queryEmbedding, document.Embedding);
-                documentSimilarities.Add(new SearchResult(document.Id, similarity, document.Content));
+                documentSimilarities.Add(new SearchResult(document.Id, similarity, document.Content, document.Metadata));
             }
 
             var topDocuments = documentSimilarities.OrderByDescending(d => d.Similarity).Take(limit).ToList();
 
             return topDocuments;
+        }
+
+        /// <inheritdoc />
+        public Document GetDocumentById(string id)
+        {
+            return _documents.FirstOrDefault(d => d.Id == id);
         }
 
         private double CosineSimilarity(float[] vectorA, float[] vectorB)

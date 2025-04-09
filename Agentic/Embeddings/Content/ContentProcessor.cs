@@ -72,13 +72,20 @@ namespace Agentic.Embeddings.Content
         {
             var chunks = TextChunker.ChunkText(content, _chunkSize);
 
-            foreach (var chunk in chunks)
+            for (int i = 0; i < chunks.Count; i++)
             {
+                var chunk = chunks[i];
                 try
                 {
                     float[] embedding = _embeddingService.GetEmbedding(chunk.Chunk);
-                    var metadata = new Dictionary<string, string> { { "source", source } };
-                    var document = new Document(Guid.NewGuid().ToString(), chunk.Chunk, embedding, metadata);
+                    var metadata = new Dictionary<string, string> 
+                    { 
+                        { "source", source },
+                        { "chunkIndex", i.ToString() }
+                    };
+
+                    string documentId = $"{source}:{i}";
+                    var document = new Document(documentId, chunk.Chunk, embedding, metadata);
                     _embeddingStore.AddDocument(document);
                 }
                 catch (Exception ex)

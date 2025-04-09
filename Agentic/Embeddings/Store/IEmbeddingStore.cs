@@ -16,6 +16,13 @@ namespace Agentic.Embeddings.Store
         /// <param name="queryEmbedding">Query to search for</param>
         /// <param name="limit">Number of documents to return</param>
         /// <returns>Closest document</returns>
-        List<SearchResult> FindClosestDocuments(float[] queryEmbedding, int limits);
+        List<SearchResult> FindClosestDocuments(float[] queryEmbedding, int limit);
+        
+        /// <summary>
+        /// Get a document by its ID
+        /// </summary>
+        /// <param name="id">Document ID</param>
+        /// <returns>The document</returns>
+        Document GetDocumentById(string id);
     }
 }

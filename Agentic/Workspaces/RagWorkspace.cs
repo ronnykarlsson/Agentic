@@ -16,6 +16,8 @@ namespace Agentic.Workspaces
         private readonly int _numberOfChatMessages = 3;
         private readonly int _retrieveDocumentCount = 3;
         private string _header = "Information to use if relevant:";
+        private int _precedingChunks = 1;
+        private int _followingChunks = 1;
 
         public RagWorkspace(IContentProcessor contentProcessor, IRetrievalService retrievalService)
         {
@@ -51,6 +53,22 @@ namespace Agentic.Workspaces
             {
                 _header = header;
             }
+
+            if (parameters.TryGetValue("precedingChunks", out var includePrecedingChunksString))
+            {
+                if (!int.TryParse(includePrecedingChunksString, out _precedingChunks))
+                {
+                    throw new FormatException("Invalid value for precedingChunks.");
+                }
+            }
+
+            if (parameters.TryGetValue("followingChunks", out var includeFollowingChunksString))
+            {
+                if (!int.TryParse(includeFollowingChunksString, out _followingChunks))
+                {
+                    throw new FormatException("Invalid value for followingChunks.");
+                }
+            }
         }
 
         public string GetPrompt(AgentExecutionContext context)
@@ -63,7 +81,16 @@ namespace Agentic.Workspaces
             if (lastMessages.Count == 0) return null;
 
             var messageContents = lastMessages.Select(msg => msg.Content);
-            var relevantDocuments = _retrievalService.RetrieveRelevantDocuments(messageContents, _retrieveDocumentCount);
+            var options = new RetrievalOptions
+            {
+                PrecedingChunks = _precedingChunks,
+                FollowingChunks = _followingChunks
+            };
+
+            var relevantDocuments = _retrievalService.RetrieveRelevantDocuments(
+                messageContents, 
+                _retrieveDocumentCount,
+                options);
 
             if (!relevantDocuments.Any()) return null;
 
