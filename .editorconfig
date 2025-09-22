@@ -1,6 +1,14 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
 
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
 # C# files
 [*.cs]
 
@@ -10,10 +18,6 @@ root = true
 indent_size = 4
 indent_style = space
 tab_width = 4
-
-# New line preferences
-end_of_line = crlf
-insert_final_newline = false
 
 #### .NET Coding Conventions ####
 
@@ -261,6 +265,12 @@ indent_size = 2
 indent_style = space
 tab_width = 4
 
-# New line preferences
+
+# Windows batch files
+[*.{bat,cmd}]
 end_of_line = crlf
-insert_final_newline = false
+
+
+# PowerShell files
+[*.ps1]
+charset = utf-8-bom
